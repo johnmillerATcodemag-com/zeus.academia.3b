@@ -1,0 +1,157 @@
+Academic is an entity type.
+Reference Scheme: Academic has empNr.
+Reference Mode: empNr.
+Data Type: Text: Fixed Length (6).
+
+Fact Types:
+Academic has empNr.
+Academic has EmpName.
+Academic is tenured.
+Academic is contracted until Date.
+Academic has Rank.
+Academic obtained Degree from University.
+Academic uses Extension.
+
+Examples: '715', '430', '139', '544', '721'
+EmpName is a value type.
+Data Type: Text: Variable Length (15).
+
+Fact Types:
+Academic has EmpName.
+
+Examples: 'Adams A', 'Codd EF', 'Rankin B', 'Thompson S', 'Zack Z'
+Date is an entity type.
+Reference Scheme: Date has mdy.
+Reference Mode: mdy.
+Data Type: Temporal: Date.
+
+Fact Types:
+Date has mdy.
+Academic is contracted until Date.
+
+Examples: 01/3/2028, 01/31/2028
+Rank is an entity type.
+Reference Scheme: Rank has Rank_code.
+Reference Mode: .code.
+Data Type: Text: Fixed Length (0).
+
+Fact Types:
+Rank has Rank_code.
+Academic has Rank.
+Rank ensures AccessLevel.
+The possible values of Rank are 'P', 'SL', 'L'.
+
+Examples: 'P', 'SL', 'L'
+Degree is an entity type.
+Reference Scheme: Degree has Degree_code.
+Reference Mode: .code.
+Data Type: Text: Fixed Length (0).
+
+Fact Types:
+Degree has Degree_code.
+Academic obtained Degree from University.
+
+Examples: 'PHD', 'MCS', 'BSc'
+University is an entity type.
+Reference Scheme: University has University_code.
+Reference Mode: .code.
+Data Type: Text: Fixed Length (0).
+
+Fact Types:
+University has University_code.
+Academic obtained Degree from University.
+
+Examples: 'UCSD', 'MIT', 'USW', 'UQ'
+AccessLevel is an entity type.
+Reference Scheme: AccessLevel has AccessLevel_code.
+Reference Mode: .code.
+Data Type: Text: Fixed Length (0).
+
+Fact Types:
+Rank ensures AccessLevel.
+AccessLevel has AccessLevel_code.
+The possible values of AccessLevel are 'INT', 'NAT', 'LOC'.
+
+Examples: 'INT', 'NAT', 'LOC'
+Extension is an entity type.
+Reference Scheme: Extension has extNr.
+Reference Mode: extNr.
+Data Type: Numeric: Decimal.
+
+Fact Types:
+Extension has extNr.
+Academic uses Extension.
+
+Examples: 2345, 3456, 4567, 5678, 6789
+Academic has EmpName.
+Each Academic has exactly one EmpName.
+It is possible that more than one Academic has the same EmpName.
+
+Examples: 
+Academic '715' has EmpName 'Adams A'.
+Academic '430' has EmpName 'Codd EF'.
+Academic '139' has EmpName 'Rankin B'.
+Academic '544' has EmpName 'Thompson S'.
+Academic '721' has EmpName 'Zack Z'.
+
+Academic is tenured.
+In each population of Academic is tenured, each Academic occurs at most once.
+
+Examples: 
+Academic '139' is tenured.
+
+Academic is contracted until Date.
+Each Academic is contracted until at most one Date.
+It is possible that more than one Academic is contracted until the same Date.
+
+Examples: 
+Academic '715' is contracted until Date 01/31/2028.
+Academic '430' is contracted until Date 01/3/2028.
+
+Academic has Rank.
+Each Academic has exactly one Rank.
+It is possible that more than one Academic has the same Rank.
+
+Examples: 
+Academic '715' has Rank 'P'.
+Academic '139' has Rank 'SL'.
+Academic '430' has Rank 'L'.
+Academic '544' has Rank 'P'.
+Academic '721' has Rank 'SL'.
+
+Academic obtained Degree from University.
+For each Academic and Degree,
+that Academic obtained that Degree from at most one University.
+This association with Academic, Degree provides the preferred identification scheme for AcademicObtainedDegreeFromUniversity.
+Each Academic obtained some Degree from some University.
+
+Examples: 
+Academic '139' obtained Degree 'PHD' from University 'UCSD'.
+Academic '430' obtained Degree 'BSc' from University 'UQ'.
+Academic '715' obtained Degree 'PHD' from University 'USW'.
+Academic '721' obtained Degree 'MCS' from University 'MIT'.
+Academic '544' obtained Degree 'PHD' from University 'USW'.
+
+Rank ensures AccessLevel.
+Each Rank ensures exactly one AccessLevel.
+It is possible that more than one Rank ensures the same AccessLevel.
+
+Examples: 
+Rank 'P' ensures AccessLevel 'INT'.
+Rank 'SL' ensures AccessLevel 'NAT'.
+Rank 'L' ensures AccessLevel 'LOC'.
+
+Academic uses Extension.
+Each Academic uses exactly one Extension.
+Each Extension is used by at most one Academic.
+
+Examples: 
+Academic '715' uses Extension 2345.
+Academic '139' uses Extension 3456.
+Academic '430' uses Extension 4567.
+Academic '721' uses Extension 5678.
+Academic '544' uses Extension 6789.
+
+For each Academic, at most one of the following holds:
+that Academic is tenured;
+that Academic is contracted until some Date.
