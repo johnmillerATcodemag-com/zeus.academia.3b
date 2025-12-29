@@ -33,28 +33,19 @@ applyTo: "**/*.prompt.md"
 
 ### AI Provenance (AI-generated files only)
 
-```yaml
-ai_generated: true
-model: "<provider>/<model>@<version>"
-operator: "<github-username>"
-chat_id: "<chat-id>"
-prompt: |
-  <exact request>
-started: "<ISO8601>"
-ended: "<ISO8601>"
-task_durations:
-  - task: "<name>"
-    duration: "<hh:mm:ss>"
-total_duration: "<hh:mm:ss>"
-ai_log: "ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/conversation.md"
-source: "<creator>"
-```
+See [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) for complete AI provenance metadata requirements.
+
+**Required fields:** `ai_generated`, `model`, `operator`, `chat_id`, `prompt`, `started`, `ended`, `task_durations`, `total_duration`, `ai_log`, `source`
+
+**Prompt-specific:** `description`, `context`, `expected_output`
 
 ### Copilot Prompt Metadata
 
 **Required:** `name` (unique ID)
 **Recommended:** `description`, `author`, `tags: [...]`
 **Optional:** `arguments`, `examples`, `context`, `expected_output`, `tools: [...]`, `mode`
+
+> **Note:** `author` refers to the creator of the prompt template. `operator` (in AI provenance) refers to the user executing the AI session.
 
 ```yaml
 name: generate-readme

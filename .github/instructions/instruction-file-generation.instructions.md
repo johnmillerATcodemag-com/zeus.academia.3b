@@ -29,22 +29,11 @@ applyTo: "**/*.instructions.md"
 
 ### AI Provenance (AI-generated files only)
 
-```yaml
-ai_generated: true
-model: "<provider>/<model>@<version>"
-operator: "<github-username>"
-chat_id: "<chat-id>"
-prompt: |
-  <exact request>
-started: "<ISO8601>"
-ended: "<ISO8601>"
-task_durations:
-  - task: "<name>"
-    duration: "<hh:mm:ss>"
-total_duration: "<hh:mm:ss>"
-ai_log: "ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/conversation.md"
-source: "<creator>"
-```
+See [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) for complete AI provenance metadata requirements.
+
+**Required fields:** `ai_generated`, `model`, `operator`, `chat_id`, `prompt`, `started`, `ended`, `task_durations`, `total_duration`, `ai_log`, `source`
+
+**Instruction-specific:** `description`, `applyTo`
 
 ### Copilot Instruction Metadata
 
