@@ -8,12 +8,14 @@
 ## Objective
 
 Create prompt files for generating token-optimized instruction files covering:
+
 1. Project overview with high-level project context
 2. AI-assisted software development process (AI code gen, AI/human reviews, PR workflow)
 
 ## Deliverables
 
 1. `.github/prompts/create-project-overview.prompt.md` – Comprehensive prompt template with:
+
    - Complete AI provenance metadata
    - Copilot-specific fields (name, description, author, tags, arguments)
    - Argument placeholders for project details (name, type, language, tech stack, purpose)
@@ -29,10 +31,10 @@ Create prompt files for generating token-optimized instruction files covering:
    - Copilot-specific fields with process-specific tags
    - Arguments for review requirements and automation levels
    - Four core process sections:
-     * AI Code Generation (metadata, quality gates, testing, documentation)
-     * AI Code Review (triggers, focus areas, severity classification, tools)
-     * Human Code Review (complementary focus areas, checklist, SLA, escalation)
-     * PR Approval Workflow (requirements, approvers, merge strategies, post-merge validation)
+     - AI Code Generation (metadata, quality gates, testing, documentation)
+     - AI Code Review (triggers, focus areas, severity classification, tools)
+     - Human Code Review (complementary focus areas, checklist, SLA, escalation)
+     - PR Approval Workflow (requirements, approvers, merge strategies, post-merge validation)
    - Process integration points and quality gates
    - Token optimization directives (7 specific rules)
    - Example token-optimized formats for each section
@@ -46,10 +48,10 @@ Create prompt files for generating token-optimized instruction files covering:
 - **Structure (Dev Process)**: Organized as 4-stage workflow: AI gen → AI review → Human review → PR approval
 - **Arguments**: Defined configurable parameters for reusability across different project policies
 - **Optimization**: Emphasized lists over prose, imperative tone, elimination of filler words
-- **Targets**: 
+- **Targets**:
   - Project overview: <200 tokens for AI orientation
   - Dev process: <3KB for complete instruction file
-- **Scope**: 
+- **Scope**:
   - Project overview: Repository-wide (`applyTo: "**"`)
   - Dev process: Repository-wide with integration touchpoints
 - **Integration**: Project overview references AI dev process for complete workflow visibility
