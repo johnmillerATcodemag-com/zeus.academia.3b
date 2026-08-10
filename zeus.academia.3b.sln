@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.12023.21
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
@@ -41,6 +41,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ManageDegrees", "ManageDegrees", "{A0316508-0CBA-48AF-9DB1-66507AAEC612}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeus.Academia.Tests.Features.ReferenceData.ManageDegrees", "tests\Features\ReferenceData\ManageDegrees\Zeus.Academia.Tests.Features.ReferenceData.ManageDegrees.csproj", "{71063E1E-06D5-456D-A5CF-9CFD12EDC65D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "orm", "orm", "{C42DFF5B-9439-4E7B-9806-895E44D421C2}"
+	ProjectSection(SolutionItems) = preProject
+		src\models\orm\academia.md = src\models\orm\academia.md
+		src\models\orm\academia.orm = src\models\orm\academia.orm
+		src\models\orm\academia.txt = src\models\orm\academia.txt
+		ORMModel2.orm = ORMModel2.orm
+		src\models\orm\README.md = src\models\orm\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,5 +156,8 @@ Global
 		{6DC0BA68-8922-4936-BD1E-696A5AF1165A} = {48605333-E382-CBAE-A288-D57D7D5A7C60}
 		{A0316508-0CBA-48AF-9DB1-66507AAEC612} = {33C22EBE-1618-2652-2009-70E325F31C1A}
 		{71063E1E-06D5-456D-A5CF-9CFD12EDC65D} = {A0316508-0CBA-48AF-9DB1-66507AAEC612}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1290A288-ACBF-4FF7-8D35-DC8D8DECAC2E}
 	EndGlobalSection
 EndGlobal
