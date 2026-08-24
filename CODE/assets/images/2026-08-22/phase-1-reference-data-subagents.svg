@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
+  <title id="title">Phase 1 reference data subagent workflow</title>
+  <desc id="desc">Shared Kernel feeds university catalog and extension pool agents before registration.</desc>
+  <rect width="1200" height="440" fill="#f6f2e9"/>
+  <path d="M0 360 C280 300 450 410 700 340 S1010 300 1200 350 V440 H0Z" fill="#d9e7e1"/>
+  <g font-family="Georgia, serif" fill="#173f45">
+    <text x="70" y="75" font-size="37" font-weight="700">Phase 1 reference data</text>
+    <text x="72" y="114" font-size="21">Specialized subagents, explicit handoffs</text>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="middle">
+    <g>
+      <rect x="70" y="190" width="210" height="95" rx="8" fill="#173f45"/>
+      <text x="175" y="230" fill="#fff">Shared Kernel</text>
+      <text x="175" y="258" fill="#d9e7e1" font-size="14">foundation</text>
+    </g>
+    <g>
+      <rect x="355" y="145" width="235" height="95" rx="8" fill="#b85c38"/>
+      <text x="472" y="185" fill="#fff">ManageUniversities</text>
+      <text x="472" y="213" fill="#fff0e8" font-size="14">canonical codes</text>
+    </g>
+    <g>
+      <rect x="355" y="275" width="235" height="95" rx="8" fill="#47756d"/>
+      <text x="472" y="315" fill="#fff">ProvisionExtension</text>
+      <text x="472" y="343" fill="#e5f0ed" font-size="14">protected inventory</text>
+    </g>
+    <g>
+      <rect x="850" y="190" width="280" height="95" rx="8" fill="#d09a3a"/>
+      <text x="990" y="230" fill="#173f45">RegisterAcademic</text>
+      <text x="990" y="258" fill="#173f45" font-size="14">downstream consumer</text>
+    </g>
+  </g>
+  <g stroke="#173f45" stroke-width="3" fill="none">
+    <path d="M285 237h55"/>
+    <path d="M590 192h230"/>
+    <path d="M590 322h230"/>
+  </g>
+  <g fill="#173f45">
+    <path d="M340 237l-11-7v14z"/>
+    <path d="M820 192l-11-7v14z"/>
+    <path d="M820 322l-11-7v14z"/>
+  </g>
+  <g font-family="Arial, sans-serif" fill="#173f45" font-size="15">
+    <text x="660" y="174">verified contract</text>
+    <text x="660" y="306">verified guard</text>
+  </g>
+</svg>
