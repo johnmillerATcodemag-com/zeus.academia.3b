@@ -44,6 +44,8 @@ Hard boundaries:
 - Do not silently skip verification.
 - Do not bypass shared-kernel or business-rule constraints for speed.
 - If the slice introduces a new route group or feature DbContext, verify the application host maps the routes and applies the migrations before calling the slice complete.
+- Do not mark a slice complete unless startup wiring, runtime reachability, config source consistency, and migration ownership are verified in the same change set.
+- If a host or service registration reads a connection string, use one source of truth and do not silently diverge between `ZEUS_SQLSERVER_CONNECTION`, `ConnectionStrings:DefaultConnection`, or feature-local configuration.
 - If a canonical helper normalizes input, validate length/shape against the normalized value, not the raw input string.
 - Do not rely on `null!` for lookup helpers; model failure paths with nullable outputs and explicit caller checks.
 

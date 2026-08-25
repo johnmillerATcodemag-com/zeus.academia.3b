@@ -42,6 +42,7 @@ tags: [aspnetcore, backend, csharp, api, rest]
 - **Nullable Reference Types**: Enabled project-wide
 - **MediatR Integration**: Use CQRS pattern via MediatR
 - **Host Wiring**: New feature route groups and startup migrations must be mapped/invoked by the application host before the slice is considered complete
+- **Single Source of Truth for Configuration**: Do not split the same runtime dependency across `ZEUS_SQLSERVER_CONNECTION`, `ConnectionStrings:DefaultConnection`, and feature-local configuration defaults when one source is already used by the host. Prefer one canonical source and fail fast with actionable diagnostics when the required value is missing.
 
 ## File Organization
 
