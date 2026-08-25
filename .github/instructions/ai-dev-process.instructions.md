@@ -70,6 +70,10 @@ applyTo: "**"
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
   - Any EF Core model, configuration, or `DbSet` addition that changes schema ships with the matching migration artifacts and updated model snapshot unless the change is explicitly documented as mapping-only.
   - Do not commit a standalone EF Core model snapshot; when migrations are in scope, include the migration class plus its Designer metadata alongside the snapshot (or omit all migration artifacts when explicitly waived as mapping-only).
+  - If a slice introduces or changes route groups, verify the application host maps them explicitly before review; do not rely on implicit discovery.
+  - If the application host calls `Database.MigrateAsync()` for a feature DbContext, ensure the feature includes matching migration artifacts or the migration owner is explicitly documented.
+  - When a canonical domain helper normalizes input before validation, run length/shape checks on the normalized value rather than the raw string.
+  - Do not use `null!` to satisfy failing lookup helpers; nullable out values are required when the failure path is real.
   - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
   - Any touched solution file must keep the required Visual Studio header as the first line with no leading blank line or stray BOM-only line.
   - Test/setup helpers and verification scripts read environment configuration once per value and reuse the parsed result instead of duplicating environment-variable lookups across branches.
