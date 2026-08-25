@@ -55,6 +55,7 @@ mode: agent
 - `UniversityRecord.Code` is the canonical primary key and must be configured explicitly as the key in the EF Core model before migration generation or startup verification.
 - The model must include a `UniversityRecordConfiguration` with `builder.HasKey(x => x.Code)` and the canonical maximum length and requiredness checks.
 - The code-length constant and normalization rule must be defined once and reused by validation, EF configuration, and any persistence or seed logic; do not silently introduce a new, conflicting rule.
+- The Shared Kernel `University` value object exposes immutable `Code`, accepts a code in `University.Create`, normalizes it with trim plus uppercase, and enforces `SharedKernelFieldLengths.UniversityCode` (20). `AcademicQualification` consumes and persists `University.Code`, not the university display name.
 - If SQL Server or LocalDB is unavailable, the verification path must fail explicitly with the connection issue; it must not continue as if the app were valid.
 
 ## Assigned Agents and Role Boundaries
@@ -100,6 +101,7 @@ mode: agent
 - Placeholder entity types are prohibited. `UniversityRecord` must be a real persistence model, not a stub or placeholder class.
 - `UniversityRecord.Code` is the canonical primary key and must be configured explicitly in EF Core using `builder.HasKey(x => x.Code)` before migration or startup validation succeeds.
 - The code normalization, uniqueness, and validation rules must be defined once and reused by validators, mappings, and persistence configuration.
+- The catalog identity must remain aligned with Shared Kernel: `UniversityRecord.Code` maps to `University.Code`, and qualification persistence uses `UniversityCode`; `Name` is descriptive metadata only.
 - Guard failures for invalid or malformed university input identify the `Code` property rather than the enclosing command object.
 - Adding a university code creates one canonical reference-data record.
 - Duplicate university codes are rejected without partial persistence.

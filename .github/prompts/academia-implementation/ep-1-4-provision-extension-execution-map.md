@@ -57,7 +57,11 @@ Use the reference-data route family:
 - `POST /api/reference-data/extensions`
 - `DELETE /api/reference-data/extensions/{number}`
 
-This slice does not add an available-extension list endpoint. `ListAvailableExtensions` remains a later slice. The API host exists at `src/Zeus.Academia.Api/Program.cs`, but it currently does not register this context or feature assembly. Host DI, migration orchestration, and route-group composition are a separate integration change and are not owned by this track during parallel execution.
+This slice does not add an available-extension list endpoint. `ListAvailableExtensions` remains a later slice. The API host exists at `src/Zeus.Academia.Api/Program.cs`; host DI and migration registration are now present, while route-group composition remains a separate integration change and is not owned by this track during parallel execution.
+
+## Host Composition Status
+
+The host project now references and registers the ProvisionExtension project, its DbContext, and its MediatR assembly, and invokes `ProvisionExtensionDbContext.Database.MigrateAsync()`. The host does not yet map ProvisionExtension endpoints because this slice has not produced an endpoint aggregator. Route mapping remains coordinator-owned and must be added only after the endpoint contract is implemented.
 
 ## Schema Decision
 

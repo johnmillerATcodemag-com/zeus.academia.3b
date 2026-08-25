@@ -6,18 +6,18 @@ public sealed class AcademicQualification
   {
   }
 
-  private AcademicQualification(string empNr, string degreeCode, string universityName)
+  private AcademicQualification(string empNr, string degreeCode, string universityCode)
   {
     EmpNr = empNr;
     DegreeCode = degreeCode;
-    UniversityName = universityName;
+    UniversityCode = universityCode;
   }
 
   public string EmpNr { get; private set; } = string.Empty;
 
   public string DegreeCode { get; private set; } = string.Empty;
 
-  public string UniversityName { get; private set; } = string.Empty;
+  public string UniversityCode { get; private set; } = string.Empty;
 
   public static AcademicQualification Create(string empNr, Degree degree, University university)
   {
@@ -26,6 +26,6 @@ public sealed class AcademicQualification
 
     var normalizedEmpNr = Academic.NormalizeEmpNr(empNr);
 
-    return new AcademicQualification(normalizedEmpNr, degree.Code, university.Name);
+    return new AcademicQualification(normalizedEmpNr, degree.Code, university.Code);
   }
 }

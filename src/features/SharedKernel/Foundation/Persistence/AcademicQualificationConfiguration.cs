@@ -20,8 +20,8 @@ public sealed class AcademicQualificationConfiguration : IEntityTypeConfiguratio
       .HasMaxLength(SharedKernelFieldLengths.DegreeCode)
       .IsRequired();
 
-    builder.Property(x => x.UniversityName)
-      .HasMaxLength(SharedKernelFieldLengths.UniversityName)
+    builder.Property(x => x.UniversityCode)
+      .HasMaxLength(SharedKernelFieldLengths.UniversityCode)
       .IsRequired();
   }
 }

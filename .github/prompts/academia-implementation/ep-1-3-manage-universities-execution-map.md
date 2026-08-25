@@ -24,7 +24,7 @@ description: "Parallel execution map for the ManageUniversities slice"
 
 ## Execution Status
 
-Planning only. Do not implement this slice until the identity and persistence blockers below are resolved. This track is independently reviewable and must not modify ProvisionExtension files or Shared Kernel files.
+Planning only. Do not implement this slice yet. The Shared Kernel identity prerequisite is resolved; this track remains independently reviewable and must not modify ProvisionExtension files.
 
 ## Prerequisite Evidence
 
@@ -70,7 +70,11 @@ Use the existing reference-data route family:
 - `POST /api/reference-data/universities`
 - `GET /api/reference-data/universities`
 
-The route group should follow the ManageDegrees feature pattern. The API host exists at `src/Zeus.Academia.Api/Program.cs`, but it currently registers only Shared Kernel, ManageRanks, and ManageDegrees. Host DI, migration orchestration, and route-group composition are a separate integration change and are not owned by this track during parallel execution.
+The route group should follow the ManageDegrees feature pattern. The API host exists at `src/Zeus.Academia.Api/Program.cs`; host DI and migration registration are now present, while route-group composition remains a separate integration change and is not owned by this track during parallel execution.
+
+## Host Composition Status
+
+The host project now references and registers the ManageUniversities project, its DbContext, and its MediatR assembly, and invokes `ManageUniversitiesDbContext.Database.MigrateAsync()`. The host does not yet map ManageUniversities endpoints because this slice has not produced an endpoint aggregator. Route mapping remains coordinator-owned and must be added only after the endpoint contract is implemented.
 
 ## Schema Decision
 
@@ -82,11 +86,11 @@ Create a standalone reference-data `Universities` table owned by `ManageUniversi
 - Uniqueness supplied by the primary key; do not add a duplicate unique index on `Code`
 - The catalog record is not a second Shared Kernel `University` domain type
 
-Do not modify `University.cs`, `AcademicQualification.cs`, `SharedKernelDbContext.cs`, or any Shared Kernel persistence configuration in this track.
+The Shared Kernel identity correction is complete and is outside the EP-1-3 implementation track. Do not make further Shared Kernel changes from this track without an explicit coordination decision.
 
-## Canonical Identity and Length Blocker
+## Canonical Identity Decision
 
-The approved resolution contract and handoff define a code-based university identity, but the checked-in Shared Kernel currently exposes `University.Name` only. `SharedKernelFieldLengths` also has `UniversityName = 100` but no `UniversityCode` constant. Before implementation, the coordinator must approve the canonical code length and downstream identity mapping. EP-1-3 must not modify Shared Kernel or silently introduce a conflicting normalization rule.
+The approved resolution contract is now implemented: `University.Code` is the immutable, normalized identity; `SharedKernelFieldLengths.UniversityCode` is 20; and `AcademicQualification` persists `UniversityCode`. `UniversityRecord.Code` must map to this identity, while `Name` remains descriptive metadata. EP-1-3 must reuse these Shared Kernel rules rather than define another normalization or length rule.
 
 ## Required Behavior
 
@@ -124,7 +128,7 @@ This track must not change any ProvisionExtension file, Shared Kernel file, exis
 
 Ready for implementation only after the coordinator records:
 
-1. `University_code` versus `University.Name` identity resolution and the canonical code length.
+1. Confirm the implementation reuses `University.Code` and the canonical length of 20.
 2. Confirmation that `ManageUniversitiesDbContext` owns the `Universities` migration root.
 3. Host route-registration and migration-composition location in `Program.cs`.
 4. An explicit confirmation that the allowed file set does not overlap the ProvisionExtension track.

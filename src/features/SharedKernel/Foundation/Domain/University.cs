@@ -2,31 +2,31 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 public sealed record University
 {
-  private University(string name)
+  private University(string code)
   {
-    Name = name;
+    Code = code;
   }
 
-  public string Name { get; }
+  public string Code { get; }
 
-  public static University Create(string name)
+  public static University Create(string code)
   {
-    var normalized = Normalize(name);
-    if (normalized.Length > SharedKernelFieldLengths.UniversityName)
+    var normalized = Normalize(code);
+    if (normalized.Length > SharedKernelFieldLengths.UniversityCode)
     {
-      throw new ArgumentException($"University name cannot exceed {SharedKernelFieldLengths.UniversityName} characters.", nameof(name));
+      throw new ArgumentException($"University code cannot exceed {SharedKernelFieldLengths.UniversityCode} characters.", nameof(code));
     }
 
     return new University(normalized);
   }
 
-  internal static string Normalize(string name)
+  internal static string Normalize(string code)
   {
-    if (string.IsNullOrWhiteSpace(name))
+    if (string.IsNullOrWhiteSpace(code))
     {
-      throw new ArgumentException("University name is required.", nameof(name));
+      throw new ArgumentException("University code is required.", nameof(code));
     }
 
-    return name.Trim();
+    return code.Trim().ToUpperInvariant();
   }
 }
