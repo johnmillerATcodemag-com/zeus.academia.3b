@@ -221,6 +221,10 @@ flowchart LR
 
 ## Shared Kernel Boundary
 
+The Shared Kernel boundary excludes application host creation, endpoint registration, dependency-injection composition, authentication, and migration execution. Those concerns belong to the Application Host and Persistence Composition implementation prompt.
+
+Feature-local DbContexts may map Shared Kernel entities and reuse reusable configuration semantics. Each feature owns migrations for its own tables, and no two DbContexts may own migrations for the same table. `ProvisionExtensionDbContext` is the sole migration owner for `Extensions`.
+
 Promote to `src/backend/SharedKernel/` upfront:
 
 | Type                                         | Rationale                                            |

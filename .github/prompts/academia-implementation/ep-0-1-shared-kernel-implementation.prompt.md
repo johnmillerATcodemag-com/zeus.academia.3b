@@ -33,7 +33,7 @@ mode: agent
 
 - Slice: Shared Kernel
 - Business outcome: establish the domain primitives, invariants, result types, and persistence constraints that every later slice depends on.
-- Out of scope: feature endpoints, UI flows, reporting queries, and seed data beyond what is needed to validate foundational constraints.
+- Out of scope: application host creation, endpoint registration, dependency-injection composition, authentication, migration execution, feature endpoints, UI flows, reporting queries, and seed data beyond what is needed to validate foundational constraints. These concerns are owned by the application-host setup implementation prompt.
 
 ## Context Files to Review First
 
@@ -50,7 +50,7 @@ mode: agent
 
 - Required prior slices: none
 - Blocking risks: feature-root or persistence-root naming may differ from the plan; confirm the actual backend root before creating files.
-- Existing patterns to reuse: nullable-enabled C#, Result/Error wrapper, domain event abstraction, EF Core uniqueness constraints, and aggregate guard methods.
+- Existing patterns to reuse: nullable-enabled C#, Result/Error wrapper, domain event abstraction, reusable EF Core configuration semantics, EF Core uniqueness constraints, and aggregate guard methods.
 
 ## Assigned Agents and Role Boundaries
 
@@ -58,7 +58,7 @@ mode: agent
 | -------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | slice-coordinator    | confirm folder roots, final type list, and sequence                             | execution plan, implementation plan, current source tree | approved artifact map and blocker list    | current repo layout conflicts with the planned SharedKernel location                                 |
 | backend-domain       | implement aggregate, value objects, result types, exceptions, and domain events | approved artifact map, business rules                    | domain types and invariant logic          | a rule cannot be expressed cleanly without clarifying the aggregate boundary                         |
-| data-persistence     | implement EF Core mappings, indexes, and migration support                      | domain model, persistence standards                      | mappings, constraints, migration updates  | a database rule would drift from the aggregate rule                                                  |
+| data-persistence     | implement reusable EF Core mappings and invariant backing semantics             | domain model, persistence standards                      | mappings, constraints, ownership contract | a database rule would drift from the aggregate rule                                                  |
 | testing-verification | add invariant tests, mapping tests, and migration validation evidence           | implemented kernel artifacts                             | passing tests and proof of enforced rules | tests expose ambiguity in employment-rule semantics, access-level derivation, or qualification rules |
 
 ## Ordered Implementation Steps
@@ -71,10 +71,10 @@ mode: agent
    Targets: Shared Kernel aggregate and value-object files, especially Academic employment guards and Rank to AccessLevel derivation.
    Owner: backend-domain.
    Validation before next step: the aggregate enforces the employment mutual-exclusion rule (never both tenured and contracted), AccessLevel is derived only from Rank, extension assignment cannot overwrite a different existing assignment, extension release cannot clear an extension owned by a different academic, and public domain APIs that accept `empNr` enforce `SharedKernelFieldLengths.EmpNr` after normalization (including qualification create and extension assign/release paths).
-3. Implement persistence mappings and hard database constraints.
-   Targets: EF Core entity configurations, indexes, and base migration updates for empNr uniqueness and extension uniqueness.
+3. Implement reusable persistence mappings and hard database-constraint semantics.
+   Targets: EF Core entity configurations, indexes, and ownership-neutral mapping semantics for empNr uniqueness and extension assignment uniqueness. Do not create application-host startup code or claim migration ownership for feature-owned tables.
    Owner: data-persistence.
-   Validation before next step: mappings align with domain rules, no persistence rule contradicts the aggregate, no unique index duplicates an existing primary key column set, and check-constraint naming matches predicate semantics (do not use Xor naming unless strict exactly-one is enforced).
+   Validation before next step: mappings align with domain rules, no persistence rule contradicts the aggregate, no unique index duplicates an existing primary key column set, check-constraint naming matches predicate semantics (do not use Xor naming unless strict exactly-one is enforced), and each mapped table has one named migration owner outside this slice.
 4. Add reusable error/result plumbing and domain event contracts.
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
    Owner: backend-domain.
@@ -109,7 +109,8 @@ mode: agent
 - Rank values map only as P -> INT, SL -> NAT, and L -> LOC, and AccessLevel is never assigned directly.
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
 - Database constraints back up the code-level uniqueness rules for empNr and extension assignment.
-- EF Core schema changes include the required migration artifact and metadata files in the same slice unless explicitly waived, and the verification evidence shows the migration output matches the intended model.
+- Shared Kernel defines reusable mapping semantics and migration-ownership rules; it does not execute migrations or own feature-slice migrations.
+- EF Core schema changes include the required migration artifact and metadata files in the owning feature slice unless explicitly waived, and verification evidence shows migration output matches the intended model.
 - Model verification checks inspect `context.Model` directly and do not depend on `IDesignTimeModel` service resolution in normal tests.
 - Extension-association invariants prevent cross-academic state corruption: assignment cannot overwrite a different active assignment, and release validates ownership before clearing links.
 - Foundational tests cover invariant success and failure paths for employment guards, derivation, and result handling.
@@ -139,6 +140,7 @@ mode: agent
 - [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] Shared Kernel scope is still limited to reusable domain and persistence foundations.
+- [ ] Application host creation, endpoint registration, dependency-injection composition, authentication, and migration execution remain outside this slice and are owned by the application-host setup implementation prompt.
 - [ ] Aggregate invariants and derived properties are enforced in code.
 - [ ] Result failure paths use actionable errors and do not rely on `Error.None` for failures.
 - [ ] Factory-validated shared primitives keep constructors non-public so validation cannot be bypassed.
@@ -149,6 +151,7 @@ mode: agent
 - [ ] Normalization logic does not introduce cross-concept coupling between unrelated domain types.
 - [ ] Read-only collection members do not expose mutable backing lists or backing arrays.
 - [ ] Database constraints back up the critical uniqueness rules.
+- [ ] Migration ownership is explicit for each persisted table, with no competing DbContext migration owner.
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
 - [ ] Verification evidence exists for invariant and mapping behavior.
 - [ ] Result primitive tests cover both `Result` and `Result<T>` invariants after any refactor.

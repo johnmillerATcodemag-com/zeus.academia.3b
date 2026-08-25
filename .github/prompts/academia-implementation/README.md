@@ -26,6 +26,7 @@ Implementation prompt set derived from `.github/models/workflows/academia-execut
 ## Phase 0
 
 - `ep-0-1-shared-kernel-implementation.prompt.md`
+- `application-host-and-persistence-composition-implementation.prompt.md`
 
 ## Phase 1
 
@@ -33,6 +34,11 @@ Implementation prompt set derived from `.github/models/workflows/academia-execut
 - `ep-1-2-manage-degrees-implementation.prompt.md`
 - `ep-1-3-manage-universities-implementation.prompt.md`
 - `ep-1-4-provision-extension-implementation.prompt.md`
+
+Execution maps:
+
+- [EP-1-3 ManageUniversities execution map](ep-1-3-manage-universities-execution-map.md) - independent artifact ownership, route/schema decisions, blockers, and verification scope.
+- [EP-1-4 ProvisionExtension execution map](ep-1-4-provision-extension-execution-map.md) - independent artifact ownership, route/schema decisions, blockers, and verification scope.
 
 ## Phase 2
 

@@ -61,7 +61,7 @@ Constraint summary:
 
 **Objective:** establish the Shared Kernel and persistence foundations used by every later slice.
 
-**Included slices:** Shared Kernel
+**Included slices:** Shared Kernel; Application Host and Persistence Composition
 
 **Blockers/Dependencies:** none
 
@@ -70,7 +70,9 @@ Constraint summary:
 - `Academic` aggregate with employment-state guards
 - `Rank`, `AccessLevel`, `Degree`, `University`, and `Extension` value objects
 - `AcademicQualification`, `Result<T>`, `Error`, domain event interfaces, and common exceptions
-- EF Core mappings, base migration, and unique constraints for `empNr` and extension assignment
+- reusable EF Core mapping semantics and invariant backing rules
+- application host, dependency-injection composition, endpoint registration, SQL Server configuration, and migration execution policy
+- explicit feature-local DbContext and migration ownership for each persisted table
 
 **Acceptance criteria:**
 
@@ -87,7 +89,7 @@ Constraint summary:
 
 **Included slices:** `ManageRanks`, `ManageDegrees`, `ManageUniversities`, `ProvisionExtension`
 
-**Blockers/Dependencies:** Phase 0
+**Blockers/Dependencies:** Phase 0, including Application Host and Persistence Composition
 
 **Deliverables:**
 

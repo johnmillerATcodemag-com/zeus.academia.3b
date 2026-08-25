@@ -48,26 +48,27 @@ mode: agent
 
 ## Prerequisites and Dependency Checks
 
-- Required prior slices: Shared Kernel
+- Required prior slices: Shared Kernel and Application Host and Persistence Composition
 - Blocking risks: extension uniqueness must be preserved for later assignment slices, so do not treat this as disposable seed data.
-- Existing patterns to reuse: command-first slice structure, validator beside command, persistence uniqueness, and guard methods preventing invalid deprovisioning.
+- Existing patterns to reuse: command-first slice structure, validator beside command, feature-local DbContext, Shared Kernel entity/configuration reuse, persistence uniqueness, and guard methods preventing invalid deprovisioning.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                        | Inputs                                           | Outputs                                        | Escalate when                                                     |
-| -------------------------- | ------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------- | ----------------------------------------------------------------- |
-| slice-coordinator          | confirm extension storage model and route placement     | execution plan, repo tree, persistence root      | approved artifact targets and dependency notes | extension state is already modeled elsewhere in a conflicting way |
-| backend-domain       | implement provision and deprovision command behavior    | Shared Kernel Extension model, slice conventions | commands, validators, handlers, endpoints      | extNr formatting or identity semantics are unclear                |
-| testing-verification | verify numeric format, uniqueness, and assignment guard | implemented slice and business rules             | tests and evidence                             | deprovision logic cannot reliably detect assigned extensions      |
+| Role                 | Responsibilities                                                                                | Inputs                                                                  | Outputs                                                      | Escalate when                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------- |
+| slice-coordinator    | confirm extension storage model, migration ownership, and route placement                       | execution plan, repo tree, persistence root                             | approved artifact targets and dependency notes               | extension state is already modeled elsewhere in a conflicting way |
+| backend-domain       | implement provision and deprovision command behavior                                            | Shared Kernel Extension model, feature-local context, slice conventions | commands, validators, handlers, endpoints                    | extNr formatting or identity semantics are unclear                |
+| data-persistence     | implement the feature-local context, reusable mapping application, and Extensions migration set | Shared Kernel Extension type/configuration, SQL Server rules            | `ProvisionExtensionDbContext`, mappings, migration artifacts | another context claims `Extensions` migration ownership           |
+| testing-verification | verify numeric format, uniqueness, and assignment guard                                         | implemented slice and business rules                                    | tests and evidence                                           | deprovision logic cannot reliably detect assigned extensions      |
 
 ## Ordered Implementation Steps
 
-1. Confirm the extension-pool model and persistence root.
-   Targets: src/features/Extensions/ProvisionExtension/ or current equivalent, entity configuration, and migration path.
+1. Confirm the extension-pool model, feature-local context, and persistence root.
+   Targets: src/features/Extensions/ProvisionExtension/, Shared Kernel Extension type/configuration, and migration path.
    Owner: slice-coordinator.
-   Validation before next step: extNr representation and provisioned-state storage are explicit.
+   Validation before next step: extNr representation, feature-local `ProvisionExtensionDbContext`, `Extensions` table ownership, and migration root are explicit.
 2. Implement provision-extension behavior.
-   Targets: provision command, validator, handler, response, endpoint, and mappings.
+   Targets: provision command, validator, handler, response, endpoint, mappings, and feature-local DbContext access.
    Owner: backend-domain.
    Validation before next step: only valid numeric extensions are accepted and duplicates are rejected.
 3. Implement deprovision-extension behavior.
@@ -75,7 +76,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: assigned extensions cannot be deprovisioned and unassigned ones can.
 4. Verify command behavior end to end.
-   Targets: validator tests, handler tests, integration tests for provision, duplicate rejection, and deprovision guards.
+   Targets: validator tests, handler tests, feature-local model tests, SQL Server migration tests, and integration tests for provision, duplicate rejection, and deprovision guards.
    Owner: testing-verification.
    Validation before next step: extension pool behavior is reliable enough for registration to depend on it.
 
@@ -87,6 +88,8 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- `ProvisionExtensionDbContext` is feature-local and is the sole migration owner for the `Extensions` table.
+- The context maps the Shared Kernel `Extension` entity and reuses `ExtensionConfiguration` semantics; no `ExtensionRecord`, duplicate entity, or competing Shared Kernel migration is introduced.
 - Provisioning accepts only valid numeric extension values and persists a unique extension record.
 - Provisioning the same extension twice fails without creating duplicates.
 - Deprovisioning an unassigned extension succeeds and removes it from the available pool.
@@ -111,6 +114,7 @@ mode: agent
 - [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] ProvisionExtension remains limited to extension-pool lifecycle behavior.
+- [ ] `ProvisionExtensionDbContext` owns the `Extensions` migration set and no other DbContext does.
 - [ ] Numeric extension validation is enforced.
 - [ ] Extension uniqueness is preserved.
 - [ ] Assigned extensions are protected from deprovisioning.
