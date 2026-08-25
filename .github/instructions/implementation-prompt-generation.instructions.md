@@ -120,6 +120,17 @@ At minimum, the prompt author MUST include the matching repository instructions 
 - The prompt MUST define handoff order so each agent knows when to start and what evidence to produce.
 - The prompt MUST separate implementation from verification responsibility.
 
+## Required Guardrails for Route Registration and Rule Reuse
+
+Every implementation prompt MUST include explicit execution checks for the following failure modes:
+
+- Startup registration check: every new endpoint aggregator or `Map...Endpoints()` method must be mapped from the application host or composition root before the slice is marked complete.
+- Runtime reachability check: the prompt must require verification that routes are registered and reachable rather than merely compiling.
+- Single-source-of-truth check: any validation, coercion, normalization, or range rule already implemented elsewhere must be reused; duplicate implementations in validators, handlers, and mappings are prohibited unless a direct review justification is recorded.
+- Drift review: the prompt must instruct the implementation agent to compare new logic with neighboring slices and shared helpers before finalizing the change.
+
+These checks are required for any slice that adds a route, API surface, persistence, or command/query validation.
+
 Every implementation prompt MUST include an agent matrix like this:
 
 | Role                    | Agent                  | Responsibility                                            | Inputs                                 | Outputs                                       |

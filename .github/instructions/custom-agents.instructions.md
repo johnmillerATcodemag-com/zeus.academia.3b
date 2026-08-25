@@ -93,6 +93,14 @@ Agent profiles are Markdown files with YAML frontmatter plus a Markdown prompt b
 - Include constraints for safety and repo conventions.
 - Keep instructions concrete and testable.
 
+### Operational Safety Guardrails
+
+- Agents that create routes, endpoints, or startup composition code must inspect the application host and verify the route is actually registered.
+- Agents that touch validation, coercion, normalization, or domain constraints must search for existing shared helpers before adding new logic.
+- Agents must not claim a feature is complete while leaving a new `Map...Endpoints()` call unregistered or while re-implementing a shared rule in multiple layers.
+- When a feature includes both a validator and a handler, the agent must confirm they use the same source-of-truth rules for numeric normalization, range validation, and conflict checks.
+- A review-only agent is expected to flag runtime wiring drift and duplicated business rules before a human review starts.
+
 ### Anti-Patterns
 
 - Overly broad prompts without domain boundaries.
@@ -100,6 +108,8 @@ Agent profiles are Markdown files with YAML frontmatter plus a Markdown prompt b
 - Missing output constraints (format, scope, files).
 - Implied behavior that depends on hidden assumptions.
 - Referencing local editor tasks or helper files that are not committed in the repository.
+- Creating new endpoint mappings without a startup registration check.
+- Duplicating normalization or validation rules across handlers, validators, and mappings.
 
 ### Persona Definition (required for role/persona-type agents)
 

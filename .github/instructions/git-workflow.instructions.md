@@ -129,6 +129,8 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 - [ ] No obvious bugs or logic errors
 - [ ] Follows project conventions (naming, structure, patterns)
 - [ ] Follows [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) for slice scope, folder boundaries, and naming
+- [ ] Every new endpoint aggregator is registered from the application startup or composition root in the same PR
+- [ ] New validation or normalization logic reuses the existing single source of truth instead of duplicating rules across handlers and validators
 - [ ] Security best practices applied (no hardcoded secrets, SQL injection risks)
 - [ ] Error handling appropriate for context
 - [ ] Performance acceptable (no N+1 queries, excessive allocations)

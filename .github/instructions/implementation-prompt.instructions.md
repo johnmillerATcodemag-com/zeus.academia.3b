@@ -51,6 +51,17 @@ Before writing an implementation prompt, gather the minimum evidence:
 
 Ground the prompt in repository evidence. Reference real files, existing instructions, and current patterns. Do not fill gaps with guesses; mark missing context and define the escalation path instead.
 
+## Required Execution Guardrails
+
+Every implementation prompt must explicitly require the implementation team to do all of the following before claiming success:
+
+- confirm that every new route or endpoint aggregator is registered in the application startup/composition root
+- verify runtime reachability rather than assuming a compile-only success
+- reuse any existing numeric normalization, validation, or conflict rules instead of duplicating them across validators and handlers
+- check neighboring slices and shared helper files for single-source-of-truth logic before new rules are introduced
+
+If the slice adds a Minimal API or route aggregation file, the acceptance criteria must include the startup mapping call and a verification step proving the path is reachable.
+
 ## Required Context Review
 
 Review these sources before drafting when they exist:

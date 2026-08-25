@@ -57,7 +57,10 @@ applyTo: "**"
   - Design-time DbContext factories and verification scripts must use the same SQL Server-specific platform guard behavior as runtime verification (no unconditional LocalDB fallback on non-Windows hosts).
 - MUST run a focused self-review for common correctness regressions before opening PR:
   - Vertical slice layout and boundaries match [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md).
-  - Placeholder scaffolding artifacts are removed or renamed before review; do not leave `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter files in committed slices.
+- Startup wiring verified: every new endpoint aggregator, `Map...Endpoints()`, and route registration is invoked from the app host or composition root in the same change.
+- Runtime reachability verified: a new route is not considered complete until its registration call is confirmed in startup or an app host integration test proves the route is reachable.
+- Single-source-of-truth validation verified: no duplicated normalization, coercion, or numeric range checks are left in both validators and handlers; reuse existing helper/domain rules instead.
+- Placeholder scaffolding artifacts are removed or renamed before review; do not leave `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter files in committed slices.
   - C# file names match their primary type name and xUnit test files contain real test classes named for the behavior under test.
   - C# source keeps one primary type per file; do not colocate unrelated primary types in the same `.cs` file.
   - Types that enforce invariants through `Create`/`TryCreate` (or equivalent factory methods) do not expose public constructors that can bypass those checks; constructor visibility must enforce the intended guardrails.

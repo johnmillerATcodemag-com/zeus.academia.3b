@@ -76,6 +76,11 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 - [Architecture Decision Record (ADR)](src/models/workflows/adr-phase-0-architecture.md) - Explains 5 key decisions, trade-offs, and alternatives
 - [Phase 0 Completion Checklist](src/models/workflows/phase-0-completion-checklist.md) - Full verification status and quality gates
 
+### AI Guardrails and Review Automation
+
+- [Code review agent](.github/agents/code-review.agent.md) - Reviews route registration, startup wiring, and duplicated validation logic before merge.
+- [Code review skill](.github/skills/code-review/SKILL.md) - Standard review checklist for runtime reachability and single-source-of-truth rule reuse.
+
 ### Phase 0 Planning & Coordination
 
 - [Academia Slice Execution Plan](.github/prompts/academia/execution-plan.md) - Phases 0-2 delivery sequence and dependencies ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))

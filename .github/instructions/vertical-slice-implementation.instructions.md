@@ -49,6 +49,14 @@ A vertical slice is one cohesive use-case that spans all relevant layers from ro
 - Prefer duplication within a use-case over coupling between slices.
 - Keep all artifacts for the same use-case together under the same feature-domain tree.
 
+### Required runtime wiring and logic-drift checks
+
+- Every new endpoint aggregator or `Map...Endpoints()` method must be invoked from the application composition root in the same change set. Do not leave a feature endpoint unregistered.
+- Every new route is not considered complete until the startup mapping file has been reviewed and the registration call is present and correct.
+- If a value is normalized, coerced, or validated in more than one place (for example, a handler, a validator, and a mapping helper), the implementation must centralize it in a single shared helper or domain primitive.
+- Duplicate numeric conversion or rule checks across a validator and a handler are treated as a correctness bug and must be refactored before review.
+- Review checklists must explicitly confirm: startup wiring, runtime reachability, and single-source-of-truth reuse for any validation or normalization logic.
+
 ## 2. Canonical Folder Structure
 
 One top-level folder per feature domain and one child folder per use-case.
