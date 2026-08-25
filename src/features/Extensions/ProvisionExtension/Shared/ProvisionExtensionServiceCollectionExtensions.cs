@@ -1,29 +1,20 @@
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MediatR;
 
 namespace Zeus.Academia.Features.Extensions.ProvisionExtension;
 
 /// <summary>
-/// Service collection extensions for ProvisionExtension feature.
-/// Registers persistence (DbContext) and MediatR handlers.
+/// Service collection extensions for the extension provisioning feature.
 /// </summary>
 public static class ProvisionExtensionServiceCollectionExtensions
 {
-  /// <summary>
-  /// Adds ProvisionExtensionDbContext and configures SQL Server connection.
-  /// This context owns migrations for the Extensions table.
-  /// Called from Program.cs during service registration (Phase 1).
-  /// </summary>
   public static IServiceCollection AddProvisionExtensionPersistence(
       this IServiceCollection services,
       IConfiguration configuration)
   {
-    var connectionString = configuration.GetConnectionString("DefaultConnection") ??
-                          Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION") ??
-                          throw new InvalidOperationException(
-                            "No connection string found for Provision Extension persistence. Configure ConnectionStrings:DefaultConnection in appsettings.json or set ZEUS_SQLSERVER_CONNECTION environment variable.");
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
 
     services.AddDbContext<ProvisionExtensionDbContext>(options =>
         options.UseSqlServer(connectionString));
@@ -31,10 +22,6 @@ public static class ProvisionExtensionServiceCollectionExtensions
     return services;
   }
 
-  /// <summary>
-  /// Registers MediatR handlers from the ProvisionExtension assembly.
-  /// Discovers and registers all commands, queries, and handlers.
-  /// </summary>
   public static IServiceCollection AddProvisionExtensionMediatR(
       this IServiceCollection services)
   {

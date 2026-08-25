@@ -1,51 +1,53 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 using Zeus.Academia.Features.SharedKernel.Foundation.Exceptions;
 
 namespace Zeus.Academia.Features.Extensions.ProvisionExtension.Provision;
 
 public sealed class ProvisionExtensionHandler : IRequestHandler<ProvisionExtensionCommand, ProvisionExtensionResponse>
 {
-  private readonly ProvisionExtensionDbContext _dbContext;
+   private readonly ProvisionExtensionDbContext _dbContext;
 
-  public ProvisionExtensionHandler(ProvisionExtensionDbContext dbContext)
-  {
-    _dbContext = dbContext;
-  }
+   public ProvisionExtensionHandler(ProvisionExtensionDbContext dbContext)
+   {
+     _dbContext = dbContext;
+   }
 
-  public async Task<ProvisionExtensionResponse> Handle(ProvisionExtensionCommand request, CancellationToken cancellationToken)
-  {
-    var extension = request.ToExtension();
+   public async Task<ProvisionExtensionResponse> Handle(ProvisionExtensionCommand request, CancellationToken cancellationToken)
+   {
+     var number = ExtensionNumberNormalizer.Normalize(request.Number);
+     var extension = Extension.Create(number);
 
-    var alreadyExists = await _dbContext.Extensions
-      .AsNoTracking()
-      .AnyAsync(x => x.Number == extension.Number, cancellationToken);
+     var alreadyExists = await _dbContext.Extensions
+       .AsNoTracking()
+       .AnyAsync(x => x.Number == extension.Number, cancellationToken);
 
-    if (alreadyExists)
-    {
-      throw new ConflictException($"Extension {extension.Number} is already provisioned.");
-    }
+     if (alreadyExists)
+     {
+       throw new ConflictException($"Extension number '{extension.Number}' is already provisioned.");
+     }
 
-    _dbContext.Extensions.Add(extension);
+     _dbContext.Extensions.Add(extension);
 
-    try
-    {
-      await _dbContext.SaveChangesAsync(cancellationToken);
-    }
-    catch (DbUpdateException)
-    {
-      var existsNow = await _dbContext.Extensions
-        .AsNoTracking()
-        .AnyAsync(x => x.Number == extension.Number, cancellationToken);
+     try
+     {
+       await _dbContext.SaveChangesAsync(cancellationToken);
+     }
+     catch (DbUpdateException)
+     {
+       var existsNow = await _dbContext.Extensions
+         .AsNoTracking()
+         .AnyAsync(x => x.Number == extension.Number, cancellationToken);
 
-      if (existsNow)
-      {
-        throw new ConflictException($"Extension {extension.Number} is already provisioned.");
-      }
+       if (existsNow)
+       {
+         throw new ConflictException($"Extension number '{extension.Number}' is already provisioned.");
+       }
 
-      throw;
-    }
+       throw;
+     }
 
-    return extension.ToResponse();
-  }
+     return extension.ToResponse();
+   }
 }

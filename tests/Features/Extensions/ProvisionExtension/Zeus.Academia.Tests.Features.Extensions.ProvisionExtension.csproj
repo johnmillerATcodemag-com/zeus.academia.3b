@@ -1,10 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -28,5 +26,4 @@
     <ProjectReference Include="..\..\..\..\src\features\Extensions\ProvisionExtension\Zeus.Academia.Features.Extensions.ProvisionExtension.csproj" />
     <ProjectReference Include="..\..\..\..\src\features\SharedKernel\Foundation\Zeus.Academia.Features.SharedKernel.Foundation.csproj" />
   </ItemGroup>
-
 </Project>

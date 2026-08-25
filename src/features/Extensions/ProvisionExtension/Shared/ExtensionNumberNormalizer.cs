@@ -2,42 +2,38 @@ namespace Zeus.Academia.Features.Extensions.ProvisionExtension;
 
 public static class ExtensionNumberNormalizer
 {
-  public static int Normalize(decimal value, string paramName)
-  {
-    if (value != decimal.Truncate(value))
-    {
-      throw new ArgumentException("Extension number must be a whole number.", paramName);
-    }
+   public const int MinValue = 1;
 
-    if (value <= 0)
-    {
-      throw new ArgumentOutOfRangeException(paramName, value, "Extension number must be greater than zero.");
-    }
+   public static int Normalize(decimal number)
+   {
+     if (number <= 0)
+     {
+       throw new ArgumentOutOfRangeException(nameof(number), "Extension number must be a positive whole number.");
+     }
 
-    if (value > int.MaxValue)
-    {
-      throw new ArgumentOutOfRangeException(paramName, value, $"Extension number must be less than or equal to {int.MaxValue}.");
-    }
+     if (number != decimal.Truncate(number))
+     {
+       throw new ArgumentException("Extension number must be a whole number.", nameof(number));
+     }
 
-    return (int)value;
-  }
+     if (number > int.MaxValue)
+     {
+       throw new ArgumentOutOfRangeException(
+         nameof(number),
+         number,
+         $"Extension number must be between {MinValue} and {int.MaxValue}.");
+     }
 
-  public static bool TryNormalize(decimal value, out int normalized)
-  {
-    try
-    {
-      normalized = Normalize(value, nameof(value));
-      return true;
-    }
-    catch (ArgumentException)
-    {
-      normalized = default;
-      return false;
-    }
-    catch (OverflowException)
-    {
-      normalized = default;
-      return false;
-    }
-  }
+     return (int)number;
+   }
+
+   public static int Normalize(int number)
+   {
+     if (number <= 0)
+     {
+       throw new ArgumentOutOfRangeException(nameof(number), "Extension number must be a positive whole number.");
+     }
+
+     return number;
+   }
 }
