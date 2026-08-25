@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
@@ -18,7 +19,11 @@ public static class ManageUniversitiesServiceCollectionExtensions
       this IServiceCollection services,
       IConfiguration configuration)
   {
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    var connectionString = configuration.GetConnectionString("DefaultConnection") ??
+      Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION") ??
+      throw new InvalidOperationException(
+        "No connection string found for Manage Universities persistence. " +
+        "Configure ConnectionStrings:DefaultConnection in appsettings.json or set ZEUS_SQLSERVER_CONNECTION environment variable.");
 
     services.AddDbContext<ManageUniversitiesDbContext>(options =>
         options.UseSqlServer(connectionString));
