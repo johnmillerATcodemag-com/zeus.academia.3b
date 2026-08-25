@@ -101,18 +101,6 @@ Agent profiles are Markdown files with YAML frontmatter plus a Markdown prompt b
 - Implied behavior that depends on hidden assumptions.
 - Referencing local editor tasks or helper files that are not committed in the repository.
 
-### Runtime-Readiness Guardrails for Agents
-
-Repository agents MUST include runtime-readiness checks in their default workflow whenever the slice adds routes, validation, or persistence.
-
-- Check the application host for endpoint registration before declaring a feature complete.
-- Check the feature-local persistence plan for migration artifacts or explicit migration ownership.
-- Confirm validation is performed on the normalized domain value when canonicalization occurs.
-- Confirm invalid input is mapped to a client-safe validation result instead of a raw 500 response.
-- Require evidence (commands, files changed, or test output) before marking a slice as complete.
-
-If a slice is not runtime-ready, the agent must report that as a blocker, not as an assumed success condition.
-
 ### Persona Definition (required for role/persona-type agents)
 
 When the agent represents a professional role, include all of the following in the prompt body:

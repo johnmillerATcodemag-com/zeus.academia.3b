@@ -115,31 +115,6 @@ public Order FindOrder(Guid id)
 }
 ```
 
-## Normalization and Validation Semantics
-
-**Rules:**
-
-- MUST apply canonical normalization before validation when the domain or value object normalizes input (`Trim()`, `ToUpperInvariant()`, parsing, canonicalization, or other coercion).
-- MUST validate the normalized value, not the raw user input, when the domain semantics depend on normalization.
-- MUST keep normalization and validation in the same decision path so length, allowed-value, and parse checks reflect the actual value that will be persisted or used.
-- MUST not silently truncate or coerce invalid data that would lose fidelity unless the behavior is explicitly required and tested.
-- MUST reject invalid domain inputs at the API boundary with a client-safe validation result instead of allowing unhandled `ArgumentException` or domain exceptions to surface as HTTP 500 responses.
-
-**Example:**
-
-```csharp
-var normalizedCode = code.Trim();
-var upperCode = normalizedCode.ToUpperInvariant();
-
-if (upperCode.Length > SharedKernelFieldLengths.UniversityCode)
-    throw new ArgumentException("University code exceeds the allowed length.", nameof(code));
-
-if (!UniversityCodeCatalog.IsSupported(upperCode))
-    throw new ArgumentException("University code is not supported.", nameof(code));
-```
-
-This rule prevents false negatives where a valid value is rejected before trimming and uppercasing, and prevents bad requests from leaking as server errors.
-
 ## Type Selection
 
 | Use Case                   | Type     | Rationale                             |
