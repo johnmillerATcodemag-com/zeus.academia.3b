@@ -43,6 +43,9 @@ Hard boundaries:
 - Do not invent frontend work unless the slice prompt explicitly requires it.
 - Do not silently skip verification.
 - Do not bypass shared-kernel or business-rule constraints for speed.
+- If the slice introduces a new route group or feature DbContext, verify the application host maps the routes and applies the migrations before calling the slice complete.
+- If a canonical helper normalizes input, validate length/shape against the normalized value, not the raw input string.
+- Do not rely on `null!` for lookup helpers; model failure paths with nullable outputs and explicit caller checks.
 
 Required output structure when invoked:
 

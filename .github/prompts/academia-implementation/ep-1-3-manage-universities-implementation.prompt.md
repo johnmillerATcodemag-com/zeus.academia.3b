@@ -100,15 +100,20 @@ mode: agent
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Placeholder entity types are prohibited. `UniversityRecord` must be a real persistence model, not a stub or placeholder class.
 - `UniversityRecord.Code` is the canonical primary key and must be configured explicitly in EF Core using `builder.HasKey(x => x.Code)` before migration or startup validation succeeds.
+- Canonical length checks must use the normalized code path; raw-input length checks are not acceptable when the Shared Kernel value object trims or canonicalizes first.
 - The code normalization, uniqueness, and validation rules must be defined once and reused by validators, mappings, and persistence configuration.
 - The catalog identity must remain aligned with Shared Kernel: `UniversityRecord.Code` maps to `University.Code`, and qualification persistence uses `UniversityCode`; `Name` is descriptive metadata only.
 - Guard failures for invalid or malformed university input identify the `Code` property rather than the enclosing command object.
+- Minimal API endpoints that advertise validation-problem responses must translate `ArgumentException` and validation-style mapping failures into `Results.ValidationProblem` or an equivalent 4xx result instead of bubbling a 500.
+- If the host migrates this DbContext at startup, the feature must include the migration artifacts or the prompt must explicitly name a different migration owner.
+- Nullable lookup helpers must expose their failure path with nullable types; do not use `null!` to satisfy a non-nullable out parameter.
 - Adding a university code creates one canonical reference-data record.
 - Duplicate university codes are rejected without partial persistence.
 - University-code normalization, uniqueness, and error messaging derive from one canonical source rather than being redefined independently in validators, mappings, and persistence rules.
 - Listing universities returns stable data that downstream slices can resolve reliably.
 - Validation, handler logic, and persistence behavior agree on duplicate handling.
 - Automated tests cover add success, duplicate rejection, and list-query behavior.
+- Feature package versions should stay aligned with sibling reference-data feature projects unless a deliberate version pin is documented.
 
 ## Human Showcase Steps
 
@@ -128,11 +133,14 @@ mode: agent
 - [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] University-code guard failures point to `Code` rather than the enclosing command object.
+- [ ] Length validation runs against the normalized code path, not the raw input string.
 - [ ] University-code normalization and uniqueness rules are defined once and reused by validators, mappings, messages, and persistence constraints.
+- [ ] Validation-style endpoint failures translate to 4xx responses instead of bubbling a 500.
 - [ ] ManageUniversities remains reference-data only.
 - [ ] University code uniqueness is enforced.
 - [ ] Query behavior is stable for downstream lookups.
 - [ ] Tests cover successful adds, duplicate rejection, and listing.
+- [ ] Host route mapping and migration ownership are explicitly accounted for.
 - [ ] Any bootstrap or seed mechanism is documented.
 - [ ] No qualification-maintenance logic leaks into this slice.
 - [ ] `UniversityRecord` is not a placeholder and defines the identity key explicitly.
