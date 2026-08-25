@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
 

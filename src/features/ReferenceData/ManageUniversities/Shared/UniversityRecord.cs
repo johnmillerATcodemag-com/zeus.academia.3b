@@ -1,6 +1,6 @@
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
-namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
+namespace Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
 public sealed class UniversityRecord
 {
@@ -12,7 +12,7 @@ public sealed class UniversityRecord
 
   public static UniversityRecord Create(string code, string name)
   {
-    var university = University.Create(code);
+    var normalizedCode = University.Create(code).Code;
 
     if (string.IsNullOrWhiteSpace(name))
     {
@@ -20,7 +20,6 @@ public sealed class UniversityRecord
     }
 
     var normalizedName = name.Trim();
-
     if (normalizedName.Length > SharedKernelFieldLengths.UniversityName)
     {
       throw new ArgumentException(
@@ -30,7 +29,7 @@ public sealed class UniversityRecord
 
     return new UniversityRecord
     {
-      Code = university.Code,
+      Code = normalizedCode,
       Name = normalizedName,
       IsActive = true
     };

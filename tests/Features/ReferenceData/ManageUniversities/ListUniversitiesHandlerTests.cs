@@ -1,19 +1,22 @@
 using Microsoft.EntityFrameworkCore;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities.ListUniversities;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 
 namespace Zeus.Academia.Tests.Features.ReferenceData.ManageUniversities;
 
 public sealed class ListUniversitiesHandlerTests
 {
   [Fact]
-  public async Task Handle_ReturnsStableSortedUniversitiesWithExpectedShape()
+  public async Task Handle_ReturnsStableSortedUniversities_WithExpectedResponseShape()
   {
     await using var dbContext = CreateInMemoryContext();
-    dbContext.Universities.AddRange(
-      UniversityRecord.Create("STANFORD", "Stanford University"),
-      UniversityRecord.Create("MIT", "Massachusetts Institute of Technology"),
-      UniversityRecord.Create("BOSTON_U", "Boston University"));
+
+    var mit = UniversityRecord.Create("MIT", "Massachusetts Institute of Technology");
+    var stanford = UniversityRecord.Create("STANFORD", "Stanford University");
+    stanford.Deactivate();
+    var harvard = UniversityRecord.Create("HARVARD", "Harvard University");
+
+    dbContext.Universities.AddRange(mit, stanford, harvard);
     await dbContext.SaveChangesAsync();
 
     var handler = new ListUniversitiesHandler(dbContext);
@@ -21,9 +24,26 @@ public sealed class ListUniversitiesHandlerTests
     var response = await handler.Handle(new ListUniversitiesQuery(), CancellationToken.None);
 
     Assert.Equal(3, response.Count);
-    Assert.Equal(["BOSTON_U", "MIT", "STANFORD"], response.Select(x => x.Code).ToArray());
-    Assert.All(response, university => Assert.True(university.IsActive));
-    Assert.Contains(response, university => university is { Code: "MIT", Name: "Massachusetts Institute of Technology" });
+    Assert.Collection(
+      response,
+      item =>
+      {
+        Assert.Equal("HARVARD", item.Code);
+        Assert.Equal("Harvard University", item.Name);
+        Assert.True(item.IsActive);
+      },
+      item =>
+      {
+        Assert.Equal("MIT", item.Code);
+        Assert.Equal("Massachusetts Institute of Technology", item.Name);
+        Assert.True(item.IsActive);
+      },
+      item =>
+      {
+        Assert.Equal("STANFORD", item.Code);
+        Assert.Equal("Stanford University", item.Name);
+        Assert.False(item.IsActive);
+      });
   }
 
   private static ManageUniversitiesDbContext CreateInMemoryContext()

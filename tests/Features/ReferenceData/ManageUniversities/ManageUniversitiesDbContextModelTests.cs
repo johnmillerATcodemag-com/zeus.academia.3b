@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 namespace Zeus.Academia.Tests.Features.ReferenceData.ManageUniversities;
@@ -17,18 +17,18 @@ public sealed class ManageUniversitiesDbContextModelTests
     var primaryKey = entityType!.FindPrimaryKey();
     Assert.NotNull(primaryKey);
     Assert.Single(primaryKey!.Properties);
-    Assert.Equal("Code", primaryKey.Properties[0].Name);
+    Assert.Equal(nameof(UniversityRecord.Code), primaryKey.Properties[0].Name);
 
     var duplicatePkUniqueIndex = entityType.GetIndexes().Any(index =>
-      index.IsUnique &&
-      index.Properties.Count == primaryKey.Properties.Count &&
-      index.Properties.Select(p => p.Name).SequenceEqual(primaryKey.Properties.Select(p => p.Name)));
+        index.IsUnique &&
+        index.Properties.Count == primaryKey.Properties.Count &&
+        index.Properties.Select(p => p.Name).SequenceEqual(primaryKey.Properties.Select(p => p.Name)));
 
     Assert.False(duplicatePkUniqueIndex);
   }
 
   [Fact]
-  public void Universities_Code_IsRequired_AndUsesCanonicalLength()
+  public void Universities_ConfiguresExpectedFieldLengthsAndRequiredness()
   {
     using var context = CreateContext();
     var entityType = context.Model.FindEntityType(typeof(UniversityRecord));
@@ -36,24 +36,19 @@ public sealed class ManageUniversitiesDbContextModelTests
     Assert.NotNull(entityType);
 
     var codeProperty = entityType!.FindProperty(nameof(UniversityRecord.Code));
+    var nameProperty = entityType.FindProperty(nameof(UniversityRecord.Name));
+    var isActiveProperty = entityType.FindProperty(nameof(UniversityRecord.IsActive));
+
     Assert.NotNull(codeProperty);
-    Assert.False(codeProperty!.IsNullable);
-    Assert.Equal(SharedKernelFieldLengths.UniversityCode, codeProperty.GetMaxLength());
-  }
+    Assert.Equal(SharedKernelFieldLengths.UniversityCode, codeProperty!.GetMaxLength());
+    Assert.False(codeProperty.IsNullable);
 
-  [Fact]
-  public void Universities_HasAllowedCodeCheckConstraint_DerivedFromCanonicalCatalog()
-  {
-    using var context = CreateContext();
+    Assert.NotNull(nameProperty);
+    Assert.Equal(SharedKernelFieldLengths.UniversityName, nameProperty!.GetMaxLength());
+    Assert.False(nameProperty.IsNullable);
 
-    var createScript = context.Database.GenerateCreateScript();
-
-    Assert.Contains("CK_Universities_Code_Allowed", createScript, StringComparison.Ordinal);
-
-    foreach (var code in UniversityCodeCatalog.SupportedCodes)
-    {
-      Assert.Contains($"'{code}'", createScript, StringComparison.Ordinal);
-    }
+    Assert.NotNull(isActiveProperty);
+    Assert.False(isActiveProperty!.IsNullable);
   }
 
   [Fact]

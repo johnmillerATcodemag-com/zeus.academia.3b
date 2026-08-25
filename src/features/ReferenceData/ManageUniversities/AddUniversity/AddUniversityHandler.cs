@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
 
@@ -17,11 +17,11 @@ public sealed class AddUniversityHandler : IRequestHandler<AddUniversityCommand,
   {
     var universityRecord = request.ToUniversityRecord();
 
-    var codeAlreadyExists = await _dbContext.Universities
+    var universityCodeAlreadyExists = await _dbContext.Universities
       .AsNoTracking()
       .AnyAsync(x => x.Code == universityRecord.Code, cancellationToken);
 
-    if (codeAlreadyExists)
+    if (universityCodeAlreadyExists)
     {
       throw new UniversityConflictException($"University code '{universityRecord.Code}' already exists.");
     }
@@ -34,11 +34,11 @@ public sealed class AddUniversityHandler : IRequestHandler<AddUniversityCommand,
     }
     catch (DbUpdateException)
     {
-      var nowExists = await _dbContext.Universities
+      var universityCodeNowExists = await _dbContext.Universities
         .AsNoTracking()
         .AnyAsync(x => x.Code == universityRecord.Code, cancellationToken);
 
-      if (nowExists)
+      if (universityCodeNowExists)
       {
         throw new UniversityConflictException($"University code '{universityRecord.Code}' already exists.");
       }

@@ -12,6 +12,7 @@ public static class ManageUniversitiesEndpoints
     var group = app.MapGroup("/api/reference-data/universities");
     group.MapAddUniversity();
     group.MapListUniversities();
+
     return app;
   }
 }

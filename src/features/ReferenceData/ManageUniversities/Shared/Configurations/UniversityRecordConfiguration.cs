@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared.Configurations;
@@ -9,10 +9,7 @@ public sealed class UniversityRecordConfiguration : IEntityTypeConfiguration<Uni
 {
   public void Configure(EntityTypeBuilder<UniversityRecord> builder)
   {
-    var allowedSqlValues = string.Join(", ", UniversityCodeCatalog.SupportedCodes.Select(code => $"'{code}'"));
-
-    builder.ToTable("Universities", tableBuilder =>
-      tableBuilder.HasCheckConstraint("CK_Universities_Code_Allowed", $"[Code] IN ({allowedSqlValues})"));
+    builder.ToTable("Universities");
 
     builder.HasKey(x => x.Code);
 

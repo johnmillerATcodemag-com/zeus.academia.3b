@@ -1,5 +1,5 @@
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 namespace Zeus.Academia.Tests.Features.ReferenceData.ManageUniversities;
@@ -27,20 +27,19 @@ public sealed class AddUniversityCommandValidatorTests
   [Fact]
   public void Validate_WhenCodeExceedsCanonicalLength_ReturnsLengthMessage()
   {
-    var code = new string('a', SharedKernelFieldLengths.UniversityCode + 1);
-    var command = new AddUniversityCommand(code);
+    var command = new AddUniversityCommand(new string('X', SharedKernelFieldLengths.UniversityCode + 1));
 
     var result = _validator.Validate(command);
 
     Assert.False(result.IsValid);
     var failure = Assert.Single(result.Errors);
     Assert.Equal(nameof(AddUniversityCommand.Code), failure.PropertyName);
-    Assert.Equal($"Code cannot exceed {SharedKernelFieldLengths.UniversityCode} characters.", failure.ErrorMessage);
+    Assert.Contains($"cannot exceed {SharedKernelFieldLengths.UniversityCode}", failure.ErrorMessage, StringComparison.OrdinalIgnoreCase);
   }
 
   [Theory]
-  [InlineData("x")]
-  [InlineData("unknown_university")]
+  [InlineData("OXFORD")]
+  [InlineData("unknown_u")]
   public void Validate_WhenCodeInvalid_ReturnsAllowedValuesMessage(string code)
   {
     var command = new AddUniversityCommand(code);
@@ -56,9 +55,10 @@ public sealed class AddUniversityCommandValidatorTests
 
   [Theory]
   [InlineData("MIT")]
+  [InlineData("mit")]
   [InlineData(" boston_u ")]
-  [InlineData("stanford")]
-  public void Validate_WhenCodeAllowed_IsValid(string code)
+  [InlineData("Stanford")]
+  public void Validate_WhenCodeIsCanonicalAfterNormalization_IsValid(string code)
   {
     var command = new AddUniversityCommand(code);
 

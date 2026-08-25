@@ -1,74 +1,77 @@
 using System.Collections.ObjectModel;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
-namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
+namespace Zeus.Academia.Features.ReferenceData.ManageUniversities;
+
+public sealed record UniversityCatalogEntry(string Code, string Name);
 
 public static class UniversityCodeCatalog
 {
-  private static readonly ReadOnlyDictionary<string, string> SupportedUniversitiesByCode =
-    new(new Dictionary<string, string>(StringComparer.Ordinal)
-    {
-      ["BOSTON_U"] = "Boston University",
-      ["MIT"] = "Massachusetts Institute of Technology",
-      ["STANFORD"] = "Stanford University"
-    });
+  private static readonly ReadOnlyCollection<UniversityCatalogEntry> SupportedUniversitiesCollection =
+    Array.AsReadOnly(
+    [
+      new UniversityCatalogEntry("BOSTON_U", "Boston University"),
+      new UniversityCatalogEntry("HARVARD", "Harvard University"),
+      new UniversityCatalogEntry("MIT", "Massachusetts Institute of Technology"),
+      new UniversityCatalogEntry("STANFORD", "Stanford University")
+    ]);
 
   private static readonly ReadOnlyCollection<string> SupportedCodesCollection =
-    Array.AsReadOnly(SupportedUniversitiesByCode.Keys.OrderBy(code => code, StringComparer.Ordinal).ToArray());
+    Array.AsReadOnly(SupportedUniversitiesCollection.Select(x => x.Code).ToArray());
+
+  private static readonly IReadOnlyDictionary<string, UniversityCatalogEntry> SupportedUniversitiesByCode =
+    SupportedUniversitiesCollection.ToDictionary(x => x.Code, StringComparer.Ordinal);
+
+  public static IReadOnlyList<UniversityCatalogEntry> SupportedUniversities => SupportedUniversitiesCollection;
 
   public static IReadOnlyList<string> SupportedCodes => SupportedCodesCollection;
 
   public static string AllowedValuesMessage => string.Join(", ", SupportedCodesCollection);
 
+  public static bool IsWithinCanonicalLength(string? code)
+  {
+    return string.IsNullOrWhiteSpace(code) || code.Trim().Length <= SharedKernelFieldLengths.UniversityCode;
+  }
+
   public static bool IsAllowed(string? code, out string normalizedCode)
   {
-    normalizedCode = string.Empty;
-
-    if (!TryParseUniversity(code, out var university))
+    if (!TryNormalizeCode(code, out normalizedCode))
     {
       return false;
     }
 
-    normalizedCode = university.Code;
     return SupportedUniversitiesByCode.ContainsKey(normalizedCode);
   }
 
-  public static bool TryResolve(string? code, out University university, out string universityName)
+  public static bool TryNormalizeCode(string? code, out string normalizedCode)
   {
-    university = null!;
-    universityName = string.Empty;
-
-    if (!TryParseUniversity(code, out university))
-    {
-      return false;
-    }
-
-    if (!SupportedUniversitiesByCode.TryGetValue(university.Code, out var resolvedName))
-    {
-      return false;
-    }
-
-    universityName = resolvedName;
-    return true;
-  }
-
-  private static bool TryParseUniversity(string? code, out University university)
-  {
-    university = null!;
-
-    if (string.IsNullOrWhiteSpace(code))
-    {
-      return false;
-    }
-
     try
     {
-      university = University.Create(code);
+      normalizedCode = University.Create(code ?? string.Empty).Code;
       return true;
     }
     catch (ArgumentException)
     {
+      normalizedCode = string.Empty;
       return false;
     }
+  }
+
+  public static bool TryGetCanonicalEntry(string? code, out UniversityCatalogEntry entry)
+  {
+    entry = null!;
+
+    if (!IsAllowed(code, out var normalizedCode))
+    {
+      return false;
+    }
+
+    if (SupportedUniversitiesByCode.TryGetValue(normalizedCode, out var catalogEntry))
+    {
+      entry = catalogEntry;
+      return true;
+    }
+
+    return false;
   }
 }
