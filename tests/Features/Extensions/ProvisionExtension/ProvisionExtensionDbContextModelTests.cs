@@ -6,61 +6,66 @@ namespace Zeus.Academia.Tests.Features.Extensions.ProvisionExtension;
 
 public sealed class ProvisionExtensionDbContextModelTests
 {
-   [Fact]
-   public void Extensions_UseSharedKernelEntity_WithNumberPrimaryKey_AndFilteredAssignmentIndex()
-   {
-      using var context = CreateContext();
-      var entityType = context.Model.FindEntityType(typeof(Extension));
+  [Fact]
+  public void Extension_Model_UsesNumberPrimaryKey_AndFilteredAssignmentIndex()
+  {
+    using var context = CreateContext();
+    var entityType = context.Model.FindEntityType(typeof(Extension));
 
-      Assert.NotNull(entityType);
+    Assert.NotNull(entityType);
+    Assert.Equal("Extensions", entityType!.GetTableName());
 
-      var primaryKey = entityType!.FindPrimaryKey();
-      Assert.NotNull(primaryKey);
-      Assert.Single(primaryKey.Properties);
-      Assert.Equal(nameof(Extension.Number), primaryKey.Properties[0].Name);
+    var primaryKey = entityType.FindPrimaryKey();
+    Assert.NotNull(primaryKey);
+    Assert.Single(primaryKey!.Properties);
+    Assert.Equal(nameof(Extension.Number), primaryKey.Properties[0].Name);
 
-      var assignmentIndex = entityType.GetIndexes()
-         .SingleOrDefault(index => index.Properties.Count == 1 && index.Properties[0].Name == nameof(Extension.AssignedEmpNr));
+    var assignedIndex = Assert.Single(entityType.GetIndexes().Where(index =>
+      index.Properties.Select(property => property.Name).SequenceEqual(new[] { nameof(Extension.AssignedEmpNr) })));
 
-      Assert.NotNull(assignmentIndex);
-      var filter = assignmentIndex!.GetFilter();
-      Assert.True(assignmentIndex.IsUnique);
-      Assert.False(string.IsNullOrWhiteSpace(filter));
-      Assert.Contains("AssignedEmpNr", filter, StringComparison.OrdinalIgnoreCase);
-      Assert.Contains("IS NOT NULL", filter, StringComparison.OrdinalIgnoreCase);
-   }
+    Assert.True(assignedIndex.IsUnique);
+    Assert.Equal("[AssignedEmpNr] IS NOT NULL", assignedIndex.GetFilter());
 
-   [Fact]
-   public void GenerateCreateScript_ContainsExtensionsTable_AndFilteredAssignmentIndex()
-   {
-      using var context = CreateContext();
-      var script = context.Database.GenerateCreateScript();
+    var createScript = context.Database.GenerateCreateScript();
+    Assert.Contains("CREATE TABLE [Extensions]", createScript, StringComparison.Ordinal);
+    Assert.Contains("PRIMARY KEY ([Number])", createScript, StringComparison.Ordinal);
+    Assert.Contains("WHERE [AssignedEmpNr] IS NOT NULL", createScript, StringComparison.Ordinal);
+  }
 
-      Assert.Contains("[Extensions]", script, StringComparison.OrdinalIgnoreCase);
-      Assert.Contains("[Number]", script, StringComparison.OrdinalIgnoreCase);
-      Assert.Contains("IX_Extensions_AssignedEmpNr", script, StringComparison.OrdinalIgnoreCase);
-   }
+  [Fact]
+  public void Extension_Model_DoesNotIntroduceDuplicateUniqueKeyIndex()
+  {
+    using var context = CreateContext();
+    var entityType = context.Model.FindEntityType(typeof(Extension));
 
-   private static ProvisionExtensionDbContext CreateContext()
-   {
-      var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
+    Assert.NotNull(entityType);
 
-      if (string.IsNullOrWhiteSpace(connectionString))
+    Assert.DoesNotContain(entityType!.GetIndexes(), index =>
+      index.IsUnique &&
+      index.Properties.Count == 1 &&
+      index.Properties[0].Name == nameof(Extension.Number));
+  }
+
+  private static ProvisionExtensionDbContext CreateContext()
+  {
+    var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
+
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+      if (OperatingSystem.IsWindows())
       {
-         if (OperatingSystem.IsWindows())
-         {
-            connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=ZeusAcademiaProvisionExtensionDesign;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
-         }
-         else
-         {
-            throw new InvalidOperationException("ZEUS_SQLSERVER_CONNECTION is required on non-Windows hosts because SQL Server LocalDB is unavailable.");
-         }
+        connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=ZeusAcademiaProvisionExtensionDesign;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
       }
+      else
+      {
+        throw new InvalidOperationException("ZEUS_SQLSERVER_CONNECTION is required on non-Windows hosts because SQL Server LocalDB is unavailable.");
+      }
+    }
 
-      var options = new DbContextOptionsBuilder<ProvisionExtensionDbContext>()
-         .UseSqlServer(connectionString)
-         .Options;
+    var options = new DbContextOptionsBuilder<ProvisionExtensionDbContext>()
+      .UseSqlServer(connectionString)
+      .Options;
 
-      return new ProvisionExtensionDbContext(options);
-   }
+    return new ProvisionExtensionDbContext(options);
+  }
 }
