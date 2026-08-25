@@ -38,23 +38,6 @@ public sealed class SharedKernelDbContextModelTests
   }
 
   [Fact]
-  public void Extension_AssignedEmpNr_HasUniqueFilteredIndex()
-  {
-    using var context = CreateContext();
-    var entityType = context.Model.FindEntityType("Zeus.Academia.Features.SharedKernel.Foundation.Domain.Extension");
-
-    Assert.NotNull(entityType);
-
-    var index = entityType!.GetIndexes().SingleOrDefault(x =>
-        x.IsUnique &&
-        x.Properties.Count == 1 &&
-        x.Properties[0].Name == "AssignedEmpNr");
-
-    Assert.NotNull(index);
-    Assert.Equal("[AssignedEmpNr] IS NOT NULL", index!.GetFilter());
-  }
-
-  [Fact]
   public void AcademicQualification_HasCompositePrimaryKey()
   {
     using var context = CreateContext();

@@ -1,5 +1,6 @@
 {
   "chat.tools.terminal.autoApprove": {
     "New-Item": true
-  }
+  },
+  "cSpell.words": ["appsettings", "localdb", "mssqllocaldb", "yourserver"]
 }

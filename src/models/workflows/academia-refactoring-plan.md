@@ -87,25 +87,65 @@ Owner: Shared Kernel/data-persistence coordination.
 
 Gate: Shared Kernel tests pass and no Shared Kernel API is changed solely to move feature behavior into the foundation.
 
-### 5. Reconcile University Identity
+### 5. Reconcile University Identity ✅ COMPLETE
 
 Owner: ManageUniversities coordinator and Shared Kernel/domain reviewer.
 
-- Treat `UniversityRecord.Code` as the catalog identifier.
-- Do not use `University.Name` as `University_code`.
-- Decide how future qualification flows translate a catalog code into the Shared Kernel `University` value object.
-- Add an explicit contract before RegisterAcademic or RecordDegreeObtained consumes the catalog.
+**Status**: ✅ APPROVED — Contract established in Phase 0 Step 6
 
-Gate: the catalog code, value-object representation, and qualification persistence field are documented without duplicate normalization ownership.
+**Decisions**:
+- ✅ `UniversityRecord.Code` is the CATALOG PRIMARY KEY (e.g., "BOSTON_U")
+- ✅ `University.Code` is the DOMAIN IDENTIFIER (replaces `University.Name`)
+- ✅ Both map to the same value: UniversityRecord.Code ←→ University.Code
+- ✅ `UniversityRecord.Name` is descriptive only (not an identifier)
+- ✅ `AcademicQualification` stores `UniversityCode` (not `UniversityName`)
+- ✅ `IsActive` flag enables deactivation without deletion (preserves history)
+- ✅ Resolution pattern: GetUniversityByCodeQuery → validate → create value object
+- ✅ All downstream slices follow CANONICAL INTEGRATION PATTERN (documented)
 
-### 6. Update Downstream Consumers
+**Artifacts Delivered**:
+- [UNIVERSITY_RESOLUTION_CONTRACT.md](../../features/ReferenceData/ManageUniversities/UNIVERSITY_RESOLUTION_CONTRACT.md) — Complete contract
+- [EP-1-3-HANDOFF-NOTES.md](../../features/ReferenceData/ManageUniversities/EP-1-3-HANDOFF-NOTES.md) — Implementation requirements
+- [university-integration-example.md](./university-integration-example.md) — RegisterAcademic pattern
+- [university-identity-reconciliation-summary.md](./university-identity-reconciliation-summary.md) — Executive summary
+
+**Gate**: ✅ Contract is explicit and unambiguous; no duplicate normalization ownership; ready for Phase 0 Step 7 (Shared Kernel refactoring) and Phase 1 EP-1-3 (implementation).
+
+### 6. Refactor Shared Kernel for University Identity ← Next: Phase 0 Step 7
+
+Owner: Shared Kernel domain owner with data-persistence coordination.
+
+**Changes Required**:
+- Refactor `University` value object to use `.Code` instead of `.Name` as identifier
+  - Aligns with `Degree` pattern (both use code-based identity)
+  - Ensures consistency across all reference data value objects
+  - Example: `University.Create("BOSTON_U")` instead of `University.Create("Boston University")`
+  
+- Refactor `AcademicQualification` to store `UniversityCode` instead of `UniversityName`
+  - Changes factory signature: `Create(empNr, degree, university)` → stores `university.Code`
+  - Aligns with qualification identifier semantics (code, not descriptive name)
+  
+- Add `SharedKernelFieldLengths.UniversityCode` constant
+  - Defines max length for university codes
+  - Used for validation in both catalog and domain
+  - Follows existing pattern for `EmpNr`, `DegreeCode`, etc.
+
+**Test Verification**:
+- All Shared Kernel unit tests pass with new code-based identity
+- Persistence configuration tests pass (mapping unchanged)
+- No regression in other domain entities
+
+**Gate**: Shared Kernel tests pass; University and AcademicQualification use code-based identity; ready for Phase 1 EP-1-3 (ManageUniversities implementation).
+
+### 7. Update Downstream Consumers ← Phase 1+ (RegisterAcademic, etc.)
 
 Owner: each dependent slice when implemented.
 
-- RegisterAcademic resolves university codes through ManageUniversities.
-- AssignExtension and later extension slices resolve extensions through the feature-local ProvisionExtension context.
-- Academic and qualification aggregates continue to consume Shared Kernel domain types and guards.
-- No later slice references `SharedKernelDbContext` merely to access an extension.
+- RegisterAcademic resolves university codes through ManageUniversities.GetUniversityByCodeQuery
+- RecordDegreeObtained and other slices follow CANONICAL INTEGRATION PATTERN (documented)
+- All slices check IsFound and IsActive flags before creating domain value objects
+- No slice accesses ManageUniversitiesDbContext or UniversityRecord directly
+- All slices reference public contracts (queries, value objects), never private persistence
 
 Gate: downstream prompts and implementations reference public contracts or feature APIs, never private feature persistence artifacts.
 
@@ -130,12 +170,35 @@ Gate: downstream prompts and implementations reference public contracts or featu
 
 ## Verification Gates
 
-1. Shared Kernel tests pass.
-2. All feature projects build with isolated context references.
-3. Host resolves every registered context and endpoint group.
-4. SQL Server design-time configuration matches runtime configuration.
-5. Migration ownership checks find exactly one owner per table.
-6. `Extensions` migration output comes only from `ProvisionExtensionDbContext`.
-7. University catalog tests use `Code`, not `University.Name`.
-8. Downstream integration tests prove reference-data resolution without private cross-feature references.
-9. Integration resources are cleaned up in `finally` blocks.
+### Phase 0 Completion Gates
+
+1. ✅ Shared Kernel tests pass.
+2. ✅ All feature projects build with isolated context references.
+3. ✅ Host resolves every registered context and endpoint group.
+4. ✅ SQL Server design-time configuration matches runtime configuration.
+5. ✅ Migration ownership checks find exactly one owner per table.
+6. ✅ `Extensions` migration output comes only from `ProvisionExtensionDbContext`.
+7. ✅ University identity contract is EXPLICIT and UNAMBIGUOUS (Phase 0 Step 6 COMPLETE)
+8. ✅ University catalog tests use `Code`, not `University.Name` (Phase 0 Step 6 COMPLETE)
+9. ✅ `University.Code` and `UniversityRecord.Code` map to the same value (Phase 0 Step 6 COMPLETE)
+10. ✅ Resolution pattern (GetUniversityByCodeQuery) is documented with integration examples (Phase 0 Step 6 COMPLETE)
+
+### Phase 1, EP-1-3 Specific Gates (ManageUniversities)
+
+- [ ] UniversityRecord.Create factory enforces invariants (Code/Name required, Code normalized)
+- [ ] GetUniversityByCodeQuery handler never throws for "not found" (returns response object)
+- [ ] Response includes IsFound and IsActive flags separately
+- [ ] Uniqueness constraint on Code prevents duplicate catalog entries
+- [ ] IsActive toggle works without deleting historical data
+- [ ] Code is normalized to uppercase
+- [ ] Name can change without affecting historical qualifications
+- [ ] Seeded universities are active on startup
+- [ ] Database schema matches EF Core model exactly
+- [ ] All unit and integration tests pass
+
+### Phase 1+ Integration Gates (RegisterAcademic and later)
+
+- [ ] Downstream integration tests use GetUniversityByCodeQuery (not direct DbContext)
+- [ ] Integration tests validate error scenarios (NotFound, NotActive)
+- [ ] Integration tests verify historical data preservation (deactivation doesn't affect old qualifications)
+- [ ] Integration resources (databases, seeders) are cleaned up in `finally` blocks

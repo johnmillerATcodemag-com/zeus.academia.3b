@@ -14,10 +14,11 @@ public sealed class SharedKernelDbContext : DbContext
 
   public DbSet<AcademicQualification> AcademicQualifications => Set<AcademicQualification>();
 
-  public DbSet<Extension> Extensions => Set<Extension>();
-
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
-    modelBuilder.ApplyConfigurationsFromAssembly(typeof(SharedKernelDbContext).Assembly);
+    // Explicitly apply only configurations for tables owned by SharedKernelDbContext
+    // Extensions configuration is excluded because ProvisionExtensionDbContext is the sole migration owner
+    modelBuilder.ApplyConfiguration(new AcademicConfiguration());
+    modelBuilder.ApplyConfiguration(new AcademicQualificationConfiguration());
   }
 }
