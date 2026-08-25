@@ -23,6 +23,13 @@ applyTo: ".github/prompts/**/*implementation*.prompt.md"
 
 # Implementation Prompt Generation
 
+## Application Host and Persistence Composition
+
+- When a repository has feature-local persistence, implementation prompts must name the application host as a separate composition boundary rather than placing startup concerns in Shared Kernel.
+- Prompts must name one feature-local DbContext and one migration owner for every persisted feature table.
+- A feature-local DbContext may map a Shared Kernel entity and reuse its configuration semantics without reusing `SharedKernelDbContext`.
+- Prompts must identify the host or deployment command responsible for applying migrations and must reject competing migration owners for the same table.
+
 ## Purpose and Scope
 
 - An **implementation prompt** defines the execution plan for one named vertical slice.

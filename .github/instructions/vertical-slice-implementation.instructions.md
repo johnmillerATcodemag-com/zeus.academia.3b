@@ -27,6 +27,12 @@ Standards for implementing feature domains as collections of self-contained use-
 
 ## 1. Core Principle
 
+### Composition and Persistence Boundary
+
+- A persistence-bearing feature may own a feature-local DbContext and migration set. Shared Kernel domain entities and reusable mapping semantics may be referenced by that context; do not require the feature to reuse `SharedKernelDbContext`.
+- Every persistence-bearing slice must explicitly name its DbContext, table ownership, migration owner, migration artifact root, and the host or deployment command that applies its migrations.
+- No two DbContexts may own migrations for the same table. Shared Kernel does not own feature-slice migrations unless the architecture explicitly assigns a table to it.
+
 Use the following terms consistently:
 
 - A `feature domain` is a top-level folder under `src/features/`, such as `Enrollment`.

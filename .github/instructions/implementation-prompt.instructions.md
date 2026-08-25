@@ -27,6 +27,12 @@ tags:
 
 # Implementation Prompt Standards
 
+## Application Composition and Persistence Ownership
+
+- Application host creation, endpoint registration, dependency-injection composition, authentication, SQL Server configuration, and migration execution belong to the application-host setup implementation prompt, not the Shared Kernel slice.
+- Each persistence-bearing feature must name its feature-local DbContext, table owner, migration root, and migration owner. No two DbContexts may own migrations for the same table.
+- A feature-local DbContext may map a Shared Kernel entity and reuse its configuration semantics without reusing `SharedKernelDbContext` or moving feature behavior into Shared Kernel.
+
 ## Purpose and Scope
 
 Use an implementation prompt to define the work plan for one slice or one explicitly bounded increment of a slice. The prompt must tell AI agents and humans what to inspect, what to build, in what order, how handoffs happen, how completion is verified, and how the slice's user value is demonstrated.

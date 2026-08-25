@@ -23,6 +23,12 @@ applyTo: "**"
 
 # AI-Assisted Software Development Process
 
+## Application Composition and Persistence Ownership
+
+- Application host creation, endpoint registration, dependency-injection composition, authentication, SQL Server configuration, and migration execution are owned by the application-host setup implementation prompt, not the Shared Kernel slice.
+- Each persistence-bearing feature uses an explicitly named feature-local DbContext and owns migrations for its tables; no two DbContexts may own migrations for the same table.
+- A feature-local DbContext may map a Shared Kernel entity and reuse its configuration semantics without reusing `SharedKernelDbContext` or introducing a duplicate domain entity.
+
 ## AI Code Generation
 
 **When to Use:**
