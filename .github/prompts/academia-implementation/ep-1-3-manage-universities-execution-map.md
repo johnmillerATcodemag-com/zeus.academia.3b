@@ -40,6 +40,8 @@ Relevant existing types and persistence:
 
 The feature project, DbContext, service-registration helper, resolution contract, and handoff notes already exist. The DbContext currently contains a placeholder `UniversityRecord`; no university handlers, endpoints, tests, or migrations exist yet.
 
+No competing university catalog model or `Universities` migration owner was found outside this feature. The existing placeholder is the only in-tree `UniversityRecord` declaration and must be replaced within this slice.
+
 ## Placeholder-Entity Blocker
 
 This track must not proceed with a placeholder `UniversityRecord` model. A placeholder entity is not an implementation and is not considered valid for migration or startup verification.
@@ -78,11 +80,11 @@ The host project now references and registers the ManageUniversities project, it
 
 ## Schema Decision
 
-Create a standalone reference-data `Universities` table owned by `ManageUniversitiesDbContext`; the context already exists and its project is registered in the solution. The host still needs coordinated registration and migration execution.
+Create a standalone reference-data `Universities` table owned by `ManageUniversitiesDbContext`; the context already exists, its project is referenced by the host, and its migration call is already composed in `Program.cs`. Only endpoint mapping remains coordinator-owned host work.
 
 - Primary key: `Code`
 - Value: normalized, canonical university code
-- Required field with the reconciled canonical maximum length
+- Required field with the canonical maximum length of 20
 - Uniqueness supplied by the primary key; do not add a duplicate unique index on `Code`
 - The catalog record is not a second Shared Kernel `University` domain type
 

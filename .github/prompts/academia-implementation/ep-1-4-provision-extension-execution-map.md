@@ -38,6 +38,8 @@ The authoritative extension model already exists:
 
 The existing model uses `Extension.Number` as the key and `AssignedEmpNr` as assignment state. The ProvisionExtension feature project, feature-local DbContext, and service-registration helper already exist. No provisioning or deprovisioning handler, endpoint, test project, migration, or separate extension pool model exists.
 
+No competing extension pool model, `Extensions` migration owner, or duplicate `Extension` entity was found outside the Shared Kernel mapping and this feature's context. `ProvisionExtensionDbContext` is the only in-tree feature context claiming `Extensions` ownership.
+
 ## Artifact Map
 
 | Surface                | Owned artifacts                                                                                                                                                               |
