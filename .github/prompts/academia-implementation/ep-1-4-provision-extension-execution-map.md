@@ -28,7 +28,7 @@ Planning only. Do not implement this slice yet. This track is independently revi
 
 ## Prerequisite Evidence
 
-Shared Kernel is available at `src/features/SharedKernel/Foundation/`. Its focused test project passed with 26 tests and zero failures.
+Shared Kernel is available at `src/features/SharedKernel/Foundation/`. Its focused test project passed with 20 tests and zero failures.
 
 The authoritative extension model already exists:
 
@@ -36,7 +36,7 @@ The authoritative extension model already exists:
 - `src/features/SharedKernel/Foundation/Persistence/ExtensionConfiguration.cs`
 - `src/features/SharedKernel/Foundation/Persistence/SharedKernelDbContext.cs`
 
-The existing model uses `Extension.Number` as the key and `AssignedEmpNr` as assignment state. No ProvisionExtension feature folder, handler, endpoint, test project, or separate extension pool model exists.
+The existing model uses `Extension.Number` as the key and `AssignedEmpNr` as assignment state. The ProvisionExtension feature project, feature-local DbContext, and service-registration helper already exist. No provisioning or deprovisioning handler, endpoint, test project, migration, or separate extension pool model exists.
 
 ## Artifact Map
 
@@ -57,7 +57,7 @@ Use the reference-data route family:
 - `POST /api/reference-data/extensions`
 - `DELETE /api/reference-data/extensions/{number}`
 
-This slice does not add an available-extension list endpoint. `ListAvailableExtensions` remains a later slice. The current repository has no API host or route-registration file in the inspected source tree, so host registration is a separate integration decision.
+This slice does not add an available-extension list endpoint. `ListAvailableExtensions` remains a later slice. The API host exists at `src/Zeus.Academia.Api/Program.cs`, but it currently does not register this context or feature assembly. Host DI, migration orchestration, and route-group composition are a separate integration change and are not owned by this track during parallel execution.
 
 ## Schema Decision
 
@@ -100,15 +100,15 @@ This track may change only:
 - `tests/Features/Extensions/ProvisionExtension/**`
 - Its own project entry in the solution, if project registration is required
 - Its own migration artifacts only when a confirmed schema change belongs to this slice
-- One coordinated host-registration file only if the host is identified and both tracks agree before editing it
+- No host-registration or migration-composition files; `src/Zeus.Academia.Api/Program.cs` is coordinator-owned
 
-This track must not change `Extension.cs`, `ExtensionConfiguration.cs`, `SharedKernelDbContext.cs`, Shared Kernel tests, any ManageUniversities file, or shared migration/snapshot files without an explicit coordination decision. It must add and use `ProvisionExtensionDbContext` inside its own feature tree.
+This track must not change `Extension.cs`, `ExtensionConfiguration.cs`, `SharedKernelDbContext.cs`, Shared Kernel tests, any ManageUniversities file, `Program.cs`, the solution file, or shared migration/snapshot files without an explicit coordination decision. It must use the existing `ProvisionExtensionDbContext` inside its own feature tree.
 
 ## Handoff Gate
 
 Ready for implementation only after the coordinator records:
 
-1. The host route-registration location.
+1. Host route-registration and migration-composition location in `Program.cs`.
 2. Confirmation that `ProvisionExtensionDbContext` is the sole migration owner for `Extensions` and whether any existing Shared Kernel schema is already deployed.
 3. The exact request representation for decimal input and its conversion to `int`.
 4. An explicit confirmation that the allowed file set does not overlap the ManageUniversities track.

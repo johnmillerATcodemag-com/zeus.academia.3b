@@ -31,12 +31,12 @@ Implementation rules for Command Query Responsibility Segregation pattern using 
 
 ### Structure
 
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| Command | Immutable DTO with intent | `Commands/<Aggregate>/<Name>Command.cs` |
-| Handler | Validates → executes → persists | `Commands/<Aggregate>/<Name>CommandHandler.cs` |
-| Validator | FluentValidation rules | `Commands/<Aggregate>/<Name>CommandValidator.cs` |
-| Result | Success/failure outcome | Return `Unit`, `Result<T>`, or custom type |
+| Component | Purpose                         | Location                                         |
+| --------- | ------------------------------- | ------------------------------------------------ |
+| Command   | Immutable DTO with intent       | `Commands/<Aggregate>/<Name>Command.cs`          |
+| Handler   | Validates → executes → persists | `Commands/<Aggregate>/<Name>CommandHandler.cs`   |
+| Validator | FluentValidation rules          | `Commands/<Aggregate>/<Name>CommandValidator.cs` |
+| Result    | Success/failure outcome         | Return `Unit`, `Result<T>`, or custom type       |
 
 ### Rules
 
@@ -46,6 +46,9 @@ Implementation rules for Command Query Responsibility Segregation pattern using 
 - No return of domain data; only confirmation/error
 - Validate via pipeline behavior or explicit validator call
 - Publish `IDomainEvent` after `SaveChangesAsync()`
+- Persistence-bearing entities and DbContext mappings must define a real primary key before any migration is applied or startup is treated as success.
+- Model validation must fail explicitly when a required key is missing; placeholder or stub persistence models are not acceptable in committed code.
+- SQL Server/LocalDB availability checks must be explicit and environment-aware; LocalDB fallback is allowed only on confirmed Windows setups, while non-Windows hosts require a concrete connection string.
 
 ### Template
 
@@ -95,11 +98,11 @@ public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
 
 ### Structure
 
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| Query | Criteria for retrieval | `Queries/<Context>/<Name>Query.cs` |
-| Handler | Reads from DB/read model | `Queries/<Context>/<Name>QueryHandler.cs` |
-| DTO | Response data shape | `Models/Queries/<Name>Dto.cs` |
+| Component | Purpose                  | Location                                  |
+| --------- | ------------------------ | ----------------------------------------- |
+| Query     | Criteria for retrieval   | `Queries/<Context>/<Name>Query.cs`        |
+| Handler   | Reads from DB/read model | `Queries/<Context>/<Name>QueryHandler.cs` |
+| DTO       | Response data shape      | `Models/Queries/<Name>Dto.cs`             |
 
 ### Rules
 
@@ -370,15 +373,15 @@ services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 ## Anti-Patterns
 
-| ❌ DON'T | ✅ DO |
-|----------|-------|
-| Return domain entities from queries | Return DTOs mapped from entities |
-| Modify state in query handlers | Use `.AsNoTracking()` and read-only logic |
-| Return business data from commands | Return only operation result (ID, success) |
-| Share models between commands/queries | Separate write models and read DTOs |
-| Cross-aggregate transactions in single command | Use domain events + eventual consistency |
-| Inject `IMediator` into domain entities | Keep domain pure, use from handlers |
-| Add unique index duplicating a primary key | Keep PK as canonical uniqueness and test key shape directly |
+| ❌ DON'T                                       | ✅ DO                                                       |
+| ---------------------------------------------- | ----------------------------------------------------------- |
+| Return domain entities from queries            | Return DTOs mapped from entities                            |
+| Modify state in query handlers                 | Use `.AsNoTracking()` and read-only logic                   |
+| Return business data from commands             | Return only operation result (ID, success)                  |
+| Share models between commands/queries          | Separate write models and read DTOs                         |
+| Cross-aggregate transactions in single command | Use domain events + eventual consistency                    |
+| Inject `IMediator` into domain entities        | Keep domain pure, use from handlers                         |
+| Add unique index duplicating a primary key     | Keep PK as canonical uniqueness and test key shape directly |
 
 ## Testing
 

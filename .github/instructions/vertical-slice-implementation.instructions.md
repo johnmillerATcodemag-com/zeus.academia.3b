@@ -32,6 +32,9 @@ Standards for implementing feature domains as collections of self-contained use-
 - A persistence-bearing feature may own a feature-local DbContext and migration set. Shared Kernel domain entities and reusable mapping semantics may be referenced by that context; do not require the feature to reuse `SharedKernelDbContext`.
 - Every persistence-bearing slice must explicitly name its DbContext, table ownership, migration owner, migration artifact root, and the host or deployment command that applies its migrations.
 - No two DbContexts may own migrations for the same table. Shared Kernel does not own feature-slice migrations unless the architecture explicitly assigns a table to it.
+- Placeholder persistence entities are prohibited. Any persistence-bearing model must define a primary key and a valid EF Core configuration before the slice is considered ready.
+- Startup and migration verification must fail explicitly when SQL Server connectivity is unavailable; do not silently skip, swallow, or pass on missing LocalDB/SQL Server prerequisites.
+- Model verification must inspect the actual EF Core model and primary-key shape directly before migration execution; no placeholder, no empty stubs, and no silent pass-through once the model is invalid.
 
 Use the following terms consistently:
 

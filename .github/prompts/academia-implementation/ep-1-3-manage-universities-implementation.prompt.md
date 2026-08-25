@@ -51,6 +51,11 @@ mode: agent
 - Required prior slices: Shared Kernel
 - Blocking risks: university code format may already appear in existing fixtures; reconcile those values before locking the validator.
 - Existing patterns to reuse: reference-data CRUD-lite behavior, code uniqueness, and deterministic listing.
+- Placeholder entity types are prohibited. `UniversityRecord` must be a real persistence model, not a stub or placeholder class.
+- `UniversityRecord.Code` is the canonical primary key and must be configured explicitly as the key in the EF Core model before migration generation or startup verification.
+- The model must include a `UniversityRecordConfiguration` with `builder.HasKey(x => x.Code)` and the canonical maximum length and requiredness checks.
+- The code-length constant and normalization rule must be defined once and reused by validation, EF configuration, and any persistence or seed logic; do not silently introduce a new, conflicting rule.
+- If SQL Server or LocalDB is unavailable, the verification path must fail explicitly with the connection issue; it must not continue as if the app were valid.
 
 ## Assigned Agents and Role Boundaries
 
@@ -92,6 +97,9 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Placeholder entity types are prohibited. `UniversityRecord` must be a real persistence model, not a stub or placeholder class.
+- `UniversityRecord.Code` is the canonical primary key and must be configured explicitly in EF Core using `builder.HasKey(x => x.Code)` before migration or startup validation succeeds.
+- The code normalization, uniqueness, and validation rules must be defined once and reused by validators, mappings, and persistence configuration.
 - Guard failures for invalid or malformed university input identify the `Code` property rather than the enclosing command object.
 - Adding a university code creates one canonical reference-data record.
 - Duplicate university codes are rejected without partial persistence.
@@ -125,3 +133,6 @@ mode: agent
 - [ ] Tests cover successful adds, duplicate rejection, and listing.
 - [ ] Any bootstrap or seed mechanism is documented.
 - [ ] No qualification-maintenance logic leaks into this slice.
+- [ ] `UniversityRecord` is not a placeholder and defines the identity key explicitly.
+- [ ] `UniversityRecord.Code` is the primary key and is validated in the EF configuration.
+- [ ] Model validation and migration startup pass only when the persistence model is complete and SQL Server is available.

@@ -22,6 +22,8 @@
     <ProjectReference Include="..\features\SharedKernel\Foundation\Zeus.Academia.Features.SharedKernel.Foundation.csproj" />
     <ProjectReference Include="..\features\ReferenceData\ManageRanks\Zeus.Academia.Features.ReferenceData.ManageRanks.csproj" />
     <ProjectReference Include="..\features\ReferenceData\ManageDegrees\Zeus.Academia.Features.ReferenceData.ManageDegrees.csproj" />
+    <ProjectReference Include="..\features\ReferenceData\ManageUniversities\Zeus.Academia.Features.ReferenceData.ManageUniversities.csproj" />
+    <ProjectReference Include="..\features\Extensions\ProvisionExtension\Zeus.Academia.Features.Extensions.ProvisionExtension.csproj" />
   </ItemGroup>
 
 </Project>

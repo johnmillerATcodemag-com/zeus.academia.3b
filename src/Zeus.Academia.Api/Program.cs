@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using MediatR;
+using Zeus.Academia.Features.Extensions.ProvisionExtension;
+using Zeus.Academia.Features.ReferenceData.ManageDegrees;
 using Zeus.Academia.Features.ReferenceData.ManageDegrees.Shared;
+using Zeus.Academia.Features.ReferenceData.ManageRanks;
 using Zeus.Academia.Features.ReferenceData.ManageRanks.Shared;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
 
 // ============================================================================
@@ -44,8 +48,9 @@ if (string.IsNullOrWhiteSpace(connectionString))
 {
   if (OperatingSystem.IsWindows())
   {
-    // Windows LocalDB fallback for local development only
-    connectionString = "Server=(localdb)\\mssqllocaldb;Database=Zeus_Academia_Dev;Integrated Security=True;TrustServerCertificate=True;";
+    // Windows LocalDB fallback for local development only.
+    // Use the default LocalDB instance name, which is MSSQLLocalDB on standard Windows installs.
+    connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Zeus_Academia_Dev;Integrated Security=True;TrustServerCertificate=True;";
   }
   else
   {
@@ -69,12 +74,20 @@ builder.Services.AddDbContext<SharedKernelDbContext>(options =>
   options.UseSqlServer(connectionString));
 
 // Feature 1: Manage Ranks (Phase 0)
-builder.Services.AddDbContext<ManageRanksDbContext>(options =>
-  options.UseSqlServer(connectionString));
+builder.Services.AddManageRanksPersistence(builder.Configuration);
+builder.Services.AddManageRanksMediatR();
 
 // Feature 2: Manage Degrees (Phase 0)
-builder.Services.AddDbContext<ManageDegreesDbContext>(options =>
-  options.UseSqlServer(connectionString));
+builder.Services.AddManageDegreesPersistence(builder.Configuration);
+builder.Services.AddManageDegreesMediatR();
+
+// Feature 3: Manage Universities (Phase 1 ownership path)
+builder.Services.AddManageUniversitiesPersistence(builder.Configuration);
+builder.Services.AddManageUniversitiesMediatR();
+
+// Feature 4: Provision Extension (sole migration owner for Extensions)
+builder.Services.AddProvisionExtensionPersistence(builder.Configuration);
+builder.Services.AddProvisionExtensionMediatR();
 
 // ============================================================================
 // Service Registration: MediatR Handlers and Validators
@@ -86,14 +99,6 @@ builder.Services.AddDbContext<ManageDegreesDbContext>(options =>
 // Shared Kernel handlers
 builder.Services.AddMediatR(cfg =>
   cfg.RegisterServicesFromAssembly(typeof(SharedKernelDbContext).Assembly));
-
-// Feature 1: Manage Ranks
-builder.Services.AddMediatR(cfg =>
-  cfg.RegisterServicesFromAssembly(typeof(ManageRanksDbContext).Assembly));
-
-// Feature 2: Manage Degrees
-builder.Services.AddMediatR(cfg =>
-  cfg.RegisterServicesFromAssembly(typeof(ManageDegreesDbContext).Assembly));
 
 // ============================================================================
 // Application Configuration
@@ -124,6 +129,14 @@ using (var scope = app.Services.CreateScope())
   // 3. Manage Degrees
   var manageDegreesContext = serviceProvider.GetRequiredService<ManageDegreesDbContext>();
   await manageDegreesContext.Database.MigrateAsync();
+
+  // 4. Manage Universities
+  var manageUniversitiesContext = serviceProvider.GetRequiredService<ManageUniversitiesDbContext>();
+  await manageUniversitiesContext.Database.MigrateAsync();
+
+  // 5. Provision Extension (sole migration owner for Extensions)
+  var provisionExtensionContext = serviceProvider.GetRequiredService<ProvisionExtensionDbContext>();
+  await provisionExtensionContext.Database.MigrateAsync();
 }
 
 // ============================================================================
@@ -132,6 +145,8 @@ using (var scope = app.Services.CreateScope())
 // Route definitions are owned by feature projects. The host only provides
 // the WebApplication instance and shared middleware/endpoints.
 
+app.MapManageDegreesEndpoints();
+app.MapManageRanksEndpoints();
 app.MapHealthCheck("/health");
 
 app.Run();

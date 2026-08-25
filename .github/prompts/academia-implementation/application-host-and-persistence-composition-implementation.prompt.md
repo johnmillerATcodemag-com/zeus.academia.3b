@@ -56,6 +56,10 @@ mode: agent
 - The current repository may not yet contain an API host, so confirm whether to create the host project or adopt an existing equivalent before editing.
 - Existing feature-local DbContext patterns are authoritative for ManageRanks and ManageDegrees.
 - No two DbContexts may own migrations for the same table.
+- Every persistence-bearing feature model must be valid before the host invokes `Database.MigrateAsync()`. If a model lacks a primary key, the host must fail with an actionable validation error rather than continuing to startup.
+- SQL Server validation must check the actual LocalDB instance or the configured `ZEUS_SQLSERVER_CONNECTION` target before trying migrations.
+- On Windows, LocalDB fallback is allowed only when the instance is confirmed available; do not assume a guessed instance name such as `mssqllocaldb` without verification.
+- Host startup smoke tests must include a health endpoint or equivalent startup probe to confirm the app is listening and the dependency graph resolves successfully.
 
 ## Assigned Agents and Role Boundaries
 
@@ -118,6 +122,9 @@ mode: agent
 - No duplicate project declarations or duplicate migration ownership exists.
 - Tests and verification commands fail explicitly when SQL Server prerequisites are unavailable; they do not silently skip.
 - Existing Shared Kernel tests and all touched feature tests pass.
+- Startup validation checks for model completeness before migration execution.
+- SQL Server/LocalDB availability is confirmed before startup is treated as successful.
+- Host startup smoke test confirms the app is listening and serving a health endpoint.
 
 ## Human Showcase Steps
 

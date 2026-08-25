@@ -51,6 +51,10 @@ mode: agent
 - Required prior slices: none
 - Blocking risks: feature-root or persistence-root naming may differ from the plan; confirm the actual backend root before creating files.
 - Existing patterns to reuse: nullable-enabled C#, Result/Error wrapper, domain event abstraction, reusable EF Core configuration semantics, EF Core uniqueness constraints, and aggregate guard methods.
+- Placeholder persistence entities are prohibited. Any persistence-bearing feature model must define a primary key and a valid EF Core configuration before the slice is considered ready.
+- Startup and migration verification must fail explicitly when SQL Server connectivity is unavailable; do not silently skip, swallow, or pass on missing LocalDB/SQL Server prerequisites.
+- Shared Kernel verification must confirm model validity before host startup, including direct inspection of the DbContext model and primary-key shape for all persistence-bearing entities.
+- Any feature-specific catalog or reference-data record introduced after Shared Kernel must have a single owner, a canonical key, and no placeholder stubs.
 
 ## Assigned Agents and Role Boundaries
 
@@ -121,6 +125,9 @@ mode: agent
 - Design-time SQL Server configuration matches cross-platform verification behavior (LocalDB fallback only under explicit Windows guard; non-Windows requires `ZEUS_SQLSERVER_CONNECTION`).
 - Newly created source and test files do not retain placeholder scaffolding; file names match the primary type or test behavior under review.
 - Support scripts and database-test helpers read each environment variable once and reuse the parsed value instead of duplicating lookups across branches.
+- No placeholder entity or scaffolded persistence type remains in a committed slice.
+- Every persistence-bearing entity has an explicit primary key and valid EF model configuration.
+- SQL Server/LocalDB prerequisites are validated before startup or migration execution; failures are explicit and actionable.
 
 ## Human Showcase Steps
 

@@ -28,7 +28,7 @@ Planning only. Do not implement this slice until the identity and persistence bl
 
 ## Prerequisite Evidence
 
-Shared Kernel is available at `src/features/SharedKernel/Foundation/`. Its focused test project passed with 26 tests and zero failures.
+Shared Kernel is available at `src/features/SharedKernel/Foundation/`. Its focused test project passed with 20 tests and zero failures.
 
 Relevant existing types and persistence:
 
@@ -38,7 +38,18 @@ Relevant existing types and persistence:
 - `src/features/SharedKernel/Foundation/Persistence/SharedKernelDbContext.cs`
 - `src/features/ReferenceData/ManageDegrees/` as the nearest reference-data implementation pattern
 
-No university feature folder, university catalog record, university handler, university endpoint, university test project, or migration currently exists.
+The feature project, DbContext, service-registration helper, resolution contract, and handoff notes already exist. The DbContext currently contains a placeholder `UniversityRecord`; no university handlers, endpoints, tests, or migrations exist yet.
+
+## Placeholder-Entity Blocker
+
+This track must not proceed with a placeholder `UniversityRecord` model. A placeholder entity is not an implementation and is not considered valid for migration or startup verification.
+
+Before implementation is considered ready:
+
+1. `UniversityRecord` must define `Code` as the primary key.
+2. `ManageUniversitiesDbContext` must configure the entity via a real `UniversityRecordConfiguration` using `HasKey(x => x.Code)`.
+3. The code normalization length and casing rules must be explicitly approved and reused consistently.
+4. The SQL Server or LocalDB verification path must fail fast when the environment is unavailable rather than silently passing through the host or migration step.
 
 ## Artifact Map
 
@@ -59,23 +70,23 @@ Use the existing reference-data route family:
 - `POST /api/reference-data/universities`
 - `GET /api/reference-data/universities`
 
-The route group should follow `src/features/ReferenceData/ManageDegrees/ManageDegreesEndpoints.cs`. There is currently no API host or route-registration file in the inspected source tree, so host registration is a separate integration decision and must not be invented inside this map.
+The route group should follow the ManageDegrees feature pattern. The API host exists at `src/Zeus.Academia.Api/Program.cs`, but it currently registers only Shared Kernel, ManageRanks, and ManageDegrees. Host DI, migration orchestration, and route-group composition are a separate integration change and are not owned by this track during parallel execution.
 
 ## Schema Decision
 
-Create a standalone reference-data `Universities` table owned by this slice if the repository's migration strategy confirms that feature-local reference-data contexts are persisted independently.
+Create a standalone reference-data `Universities` table owned by `ManageUniversitiesDbContext`; the context already exists and its project is registered in the solution. The host still needs coordinated registration and migration execution.
 
 - Primary key: `Code`
 - Value: normalized, canonical university code
-- Required field with the shared maximum length
+- Required field with the reconciled canonical maximum length
 - Uniqueness supplied by the primary key; do not add a duplicate unique index on `Code`
 - The catalog record is not a second Shared Kernel `University` domain type
 
 Do not modify `University.cs`, `AcademicQualification.cs`, `SharedKernelDbContext.cs`, or any Shared Kernel persistence configuration in this track.
 
-## Canonical Identity Blocker
+## Canonical Identity and Length Blocker
 
-The Shared Kernel currently exposes `University.Name`, while the ORM and workflow contract define `University_code`. Before implementation, the coordinator must decide whether `Name` is intentionally the persisted code or whether a future coordinated Shared Kernel change is needed. The slice must not silently create a second normalization rule or claim downstream code compatibility without that decision.
+The approved resolution contract and handoff define a code-based university identity, but the checked-in Shared Kernel currently exposes `University.Name` only. `SharedKernelFieldLengths` also has `UniversityName = 100` but no `UniversityCode` constant. Before implementation, the coordinator must approve the canonical code length and downstream identity mapping. EP-1-3 must not modify Shared Kernel or silently introduce a conflicting normalization rule.
 
 ## Required Behavior
 
@@ -103,15 +114,17 @@ This track may change only:
 - `tests/Features/ReferenceData/ManageUniversities/**`
 - Its own project entry in the solution, if project registration is required
 - Its own migration artifacts, after migration ownership is confirmed
-- One coordinated host-registration file only if the host is identified and both tracks agree before editing it
+- No host-registration or migration-composition files; `src/Zeus.Academia.Api/Program.cs` is coordinator-owned
 
-This track must not change any ProvisionExtension file, Shared Kernel file, existing ManageRanks or ManageDegrees file, or shared migration/snapshot file without an explicit coordination decision.
+A placeholder `UniversityRecord`, empty persistence model, or stub configuration is not allowed in any committed implementation.
+
+This track must not change any ProvisionExtension file, Shared Kernel file, existing ManageRanks or ManageDegrees file, `Program.cs`, the solution file, or shared migration/snapshot file without an explicit coordination decision.
 
 ## Handoff Gate
 
 Ready for implementation only after the coordinator records:
 
-1. `University_code` versus `University.Name` identity resolution.
-2. Owning DbContext and migration root.
-3. Host route-registration location.
+1. `University_code` versus `University.Name` identity resolution and the canonical code length.
+2. Confirmation that `ManageUniversitiesDbContext` owns the `Universities` migration root.
+3. Host route-registration and migration-composition location in `Program.cs`.
 4. An explicit confirmation that the allowed file set does not overlap the ProvisionExtension track.
