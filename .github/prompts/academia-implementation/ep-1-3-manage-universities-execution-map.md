@@ -52,6 +52,9 @@ Before implementation is considered ready:
 2. `ManageUniversitiesDbContext` must configure the entity via a real `UniversityRecordConfiguration` using `HasKey(x => x.Code)`.
 3. The code normalization length and casing rules must be explicitly approved and reused consistently.
 4. The SQL Server or LocalDB verification path must fail fast when the environment is unavailable rather than silently passing through the host or migration step.
+5. The application host must map the ManageUniversities endpoint group before the slice is considered complete.
+6. If the host invokes `Database.MigrateAsync()` for this DbContext, the slice must include matching migration artifacts or explicitly document a different migration owner.
+7. Any lookup helper that can fail should model the failure path with nullable types instead of `null!`.
 
 ## Artifact Map
 
@@ -99,9 +102,11 @@ The approved resolution contract is now implemented: `University.Code` is the im
 - Add accepts only a valid canonical university code.
 - Whitespace and casing normalization has one owner and is reused by the validator, mapping, error messages, and EF configuration.
 - Invalid input identifies the `Code` property.
+- Canonical length checks must run against the trimmed/normalized code path, not the raw input string.
 - Duplicate codes fail without partial persistence.
 - List returns stable deterministic ordering.
 - The slice remains reference-data only; it does not assign universities to qualifications.
+- Feature package versions must stay aligned with sibling reference-data feature projects unless a deliberate version pin is documented.
 
 ## Verification Map
 

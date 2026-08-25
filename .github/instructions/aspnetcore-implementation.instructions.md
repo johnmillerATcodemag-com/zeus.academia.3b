@@ -41,6 +41,7 @@ tags: [aspnetcore, backend, csharp, api, rest]
 - **Async/Await**: All I/O operations must be async
 - **Nullable Reference Types**: Enabled project-wide
 - **MediatR Integration**: Use CQRS pattern via MediatR
+- **Host Wiring**: New feature route groups and startup migrations must be mapped/invoked by the application host before the slice is considered complete
 
 ## File Organization
 
@@ -49,6 +50,7 @@ tags: [aspnetcore, backend, csharp, api, rest]
 - `src/shared/` - Cross-cutting middleware, primitives, and infrastructure abstractions
 - Keep controllers or minimal API extensions close to the use-case they expose
 - Naming: PascalCase for all files matching class names
+- When a minimal API advertises a validation-problem response, catch parse/mapping `ArgumentException` failures and convert them to `Results.ValidationProblem` or another explicit 4xx result instead of letting them surface as a 500
 
 ## Standard Patterns
 
@@ -490,3 +492,6 @@ public static class DependencyInjection
 
 ❌ Nullable warnings suppressed (`!` operator overuse)
 ✅ Proper null checking or non-nullable design
+
+❌ Feature endpoints or DbContexts assumed to be wired by convention
+✅ Host code explicitly maps each feature route group and applies each feature migration set

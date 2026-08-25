@@ -91,6 +91,7 @@ public sealed class Order
 - MUST NOT use `!` null-forgiving operator without validation
 - MUST use null-conditional (`?.`) and null-coalescing (`??`) operators
 - MUST validate parameters with `ArgumentNullException.ThrowIfNull(param)` (C# 12+)
+- MUST model failing `Try*` lookup outputs with nullable out values (for example `T?`) rather than `null!`, and callers must null-check before dereferencing
 
 **Examples:**
 
@@ -240,6 +241,7 @@ When implementing value objects or parse/create methods, normalize input without
 - MUST reject lossy numeric conversions (for example truncating fractional values) unless explicitly required by the domain
 - MUST throw actionable exceptions for invalid precision/format instead of coercing to a different value
 - SHOULD include allowed ranges or formats in failure messages when constraints are strict
+- MUST run length checks against the same normalized representation used by persistence and lookup when the domain canonicalizes input (for example trim/uppercase first, then measure)
 
 **Template:**
 
