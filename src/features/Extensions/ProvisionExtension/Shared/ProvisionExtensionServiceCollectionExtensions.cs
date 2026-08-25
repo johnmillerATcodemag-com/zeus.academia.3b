@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MediatR;
 
 namespace Zeus.Academia.Features.Extensions.ProvisionExtension;
 
@@ -19,7 +20,10 @@ public static class ProvisionExtensionServiceCollectionExtensions
       this IServiceCollection services,
       IConfiguration configuration)
   {
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    var connectionString = configuration.GetConnectionString("DefaultConnection") ??
+                          Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION") ??
+                          throw new InvalidOperationException(
+                            "No connection string found for Provision Extension persistence. Configure ConnectionStrings:DefaultConnection in appsettings.json or set ZEUS_SQLSERVER_CONNECTION environment variable.");
 
     services.AddDbContext<ProvisionExtensionDbContext>(options =>
         options.UseSqlServer(connectionString));

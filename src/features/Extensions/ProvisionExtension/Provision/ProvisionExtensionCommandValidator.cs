@@ -1,18 +1,21 @@
 using FluentValidation;
+using Zeus.Academia.Features.Extensions.ProvisionExtension;
 
 namespace Zeus.Academia.Features.Extensions.ProvisionExtension.Provision;
 
 public sealed class ProvisionExtensionCommandValidator : AbstractValidator<ProvisionExtensionCommand>
 {
-   public ProvisionExtensionCommandValidator()
-   {
-      RuleFor(x => x.ExtNr)
-         .Cascade(CascadeMode.Stop)
-         .Must(value => value > 0)
-         .WithMessage("Extension number must be greater than zero.")
-         .Must(value => value == decimal.Truncate(value))
-         .WithMessage("Extension number must be a whole number.")
-         .Must(value => value >= 1 && value <= int.MaxValue)
-         .WithMessage($"Extension number must be between 1 and {int.MaxValue}.");
-   }
+  public ProvisionExtensionCommandValidator()
+  {
+    RuleFor(x => x.Number)
+      .Custom((value, context) =>
+      {
+        if (ExtensionNumberNormalizer.TryNormalize(value, out _))
+        {
+          return;
+        }
+
+        context.AddFailure(nameof(ProvisionExtensionCommand.Number), "Extension number must be a positive whole number between 1 and 2147483647.");
+      });
+  }
 }
