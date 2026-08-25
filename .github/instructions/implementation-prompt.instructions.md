@@ -87,6 +87,7 @@ Include layer-specific instructions for every touched surface. At minimum:
 - Pinia: `.github/instructions/pinia-implementation.instructions.md`
 - backend tests: `.github/instructions/xunit-implementation.instructions.md`
 - frontend tests: `.github/instructions/vitest-implementation.instructions.md`
+- For any new endpoint group, route registration, identity normalization, or persistence model, explicitly list the exact host wiring, validation contract, and migration artifacts required before the slice is considered complete
 
 ## Agent-Oriented Roles
 

@@ -35,6 +35,8 @@ Standards for implementing feature domains as collections of self-contained use-
 - Placeholder persistence entities are prohibited. Any persistence-bearing model must define a primary key and a valid EF Core configuration before the slice is considered ready.
 - Startup and migration verification must fail explicitly when SQL Server connectivity is unavailable; do not silently skip, swallow, or pass on missing LocalDB/SQL Server prerequisites.
 - Model verification must inspect the actual EF Core model and primary-key shape directly before migration execution; no placeholder, no empty stubs, and no silent pass-through once the model is invalid.
+- A new endpoint group or route registration is not complete until the application host invokes the map method for that feature and the route is reachable at runtime.
+- Any new feature DbContext, model, or schema change must ship with the required migration artifact or an explicit mapping-only waiver; startup `Database.MigrateAsync()` alone does not satisfy readiness without the migration in the repository.
 
 Use the following terms consistently:
 

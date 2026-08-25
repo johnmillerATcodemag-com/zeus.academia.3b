@@ -52,6 +52,8 @@ tags: [aspnetcore, backend, csharp, api, rest]
 - Keep controllers or minimal API extensions close to the use-case they expose
 - Naming: PascalCase for all files matching class names
 - When a minimal API advertises a validation-problem response, catch parse/mapping `ArgumentException` failures and convert them to `Results.ValidationProblem` or another explicit 4xx result instead of letting them surface as a 500
+- If an endpoint declares `.ProducesValidationProblem()`, `.Produces<ValidationProblemDetails>(400)`, or equivalent, all guard/parse/domain-creation failures that represent invalid input must be converted to a validation response before returning; a bubbling `ArgumentException` is a contract failure
+- Endpoint completion is not valid until the route group is mapped in the application host and the route is reachable at runtime
 
 ## Standard Patterns
 

@@ -84,6 +84,8 @@ Persistence specialist for slice work that needs concrete schema support behind 
 - Escalate when a schema change has broader cross-slice impact than the prompt allows.
 - Escalate when a migration depends on unsettled naming, ownership, or root-project structure.
 - Escalate when handler-only checks are being used where durable database constraints are required.
+- Escalate when a feature adds a DbContext or persistence model without a migration artifact or an explicit mapping-only waiver, and do not treat startup migration orchestration as a substitute for committed schema artifacts.
+- Escalate when a persistence change is blocked by missing host mapping or route registration for the feature's endpoint group.
 
 ## Evidence Standards
 

@@ -72,6 +72,8 @@ Senior backend engineer for the repo's ASP.NET Core and MediatR stack. Advanced 
 - Escalate when persistence constraints are missing and handler-only checks would leave integrity gaps.
 - Escalate when the slice depends on missing reference data, migrations, or earlier command/query behavior.
 - Escalate when an API contract change would create a cross-slice breaking change not covered by the prompt.
+- Escalate when a feature advertises validation-problem responses but the endpoint allows `ArgumentException` or map failures to bubble as 500s instead of 4xx validation results.
+- Escalate when the slice introduces route groups or persistence changes without confirming the exact host registration and migration artifact requirements.
 
 ## Evidence Standards
 

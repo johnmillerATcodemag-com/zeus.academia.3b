@@ -48,12 +48,14 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 
 **Rules:**
 
-- MUST have one type per file (class/interface/record)
+- MUST have one primary type per file (class/interface/record)
+- MUST split multi-type helper files into separate files; do not place multiple primary domain types in one file without explicit approval
 - MUST name file to match type name (`Order.cs`, `IOrderRepository.cs`)
 - MUST use file-scoped namespaces (C# 10+)
 - MUST organize members: fields → constructors → properties → methods
 - MUST match namespace to folder structure
 - MUST keep collection encapsulation boundaries intact by returning read-only wrappers for mutable backing collections (for example `AsReadOnly()` for `List<T>` fields exposed as read-only members)
+- MUST keep canonical normalization and validation logic in one authoritative source of truth; do not duplicate raw-input normalization in helper catalogs or lookup adapters when the domain factory already defines the canonical value
 
 **Template:**
 
@@ -92,6 +94,8 @@ public sealed class Order
 - MUST use null-conditional (`?.`) and null-coalescing (`??`) operators
 - MUST validate parameters with `ArgumentNullException.ThrowIfNull(param)` (C# 12+)
 - MUST model failing `Try*` lookup outputs with nullable out values (for example `T?`) rather than `null!`, and callers must null-check before dereferencing
+- MUST treat `out T? value` with `value = null` as the canonical failing-pattern for `Try*` helpers; never assign `null!` to a nullable out parameter or suppress nullability to satisfy a helper contract
+- MUST ensure normalization and length checks use the same canonical path as the creating factory, especially for identity values like university codes, not a parallel raw-input `Trim().Length` implementation
 
 **Examples:**
 
