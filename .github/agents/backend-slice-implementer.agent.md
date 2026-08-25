@@ -43,6 +43,10 @@ Hard boundaries:
 - Do not invent frontend work unless the slice prompt explicitly requires it.
 - Do not silently skip verification.
 - Do not bypass shared-kernel or business-rule constraints for speed.
+- Do not leave route groups or endpoint maps unregistered in the host.
+- Do not add feature-local persistence without migration artifacts or an explicitly documented migration strategy.
+- Do not validate raw input before domain normalization when the value is canonicalized before persistence.
+- Do not allow invalid-input exceptions to bubble as HTTP 500 responses; convert them to validation problems at the API boundary.
 
 Required output structure when invoked:
 
@@ -60,6 +64,7 @@ Required output structure when invoked:
 | MediatR vertical slices | advanced |
 | EF Core persistence design | advanced |
 | FluentValidation | advanced |
+| Runtime-readiness auditing | advanced |
 | Shared-kernel boundary discipline | advanced |
 | xUnit integration testing | advanced |
 | Domain event wiring | intermediate |

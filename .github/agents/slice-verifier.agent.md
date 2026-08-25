@@ -43,6 +43,10 @@ Hard boundaries:
 - Do not change production code as part of verification.
 - Do not replace missing tests with optimism.
 - Do not expand verification into unrelated slices.
+- Do not mark a slice as complete when its route group is not mounted in the host.
+- Do not mark persistence complete when feature-local migrations are missing and startup migration is enabled.
+- Do not accept validation logic that uses raw input instead of the normalized domain value.
+- Do not accept unhandled validation exceptions that leak as HTTP 500s instead of 400/validation responses.
 
 Required output structure when invoked:
 
@@ -61,6 +65,7 @@ Required output structure when invoked:
 | Integration-test assessment | advanced     |
 | Failure-path analysis       | advanced     |
 | Demo-script validation      | advanced     |
+| Runtime-readiness auditing  | advanced     |
 | Residual-risk communication | advanced     |
 | C# backend code review      | intermediate |
 

@@ -120,6 +120,18 @@ At minimum, the prompt author MUST include the matching repository instructions 
 - The prompt MUST define handoff order so each agent knows when to start and what evidence to produce.
 - The prompt MUST separate implementation from verification responsibility.
 
+## Runtime-Readiness Requirements
+
+Every implementation prompt MUST include an explicit runtime-readiness section for any slice that adds routes, API contracts, validation, or persistence.
+
+- Verify that new endpoint groups are mounted in the application host before completion.
+- Verify that a feature-local `DbContext` has migration artifacts or a documented migration strategy before startup migration is enabled.
+- Validate against the normalized domain value, not the raw input string, when the domain canonicalizes values before persistence.
+- Translate invalid-domain exceptions at the API boundary to `ValidationProblem` / 400 responses rather than allowing a 500 to leak.
+- Add or update a focused test that proves the route registration and validation-path behavior actually work in the application startup context.
+
+This section is not optional. A slice that compiles but is not runtime-ready is not complete.
+
 Every implementation prompt MUST include an agent matrix like this:
 
 | Role                    | Agent                  | Responsibility                                            | Inputs                                 | Outputs                                       |

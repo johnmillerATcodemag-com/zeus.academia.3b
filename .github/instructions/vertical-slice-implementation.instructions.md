@@ -87,7 +87,20 @@ Rules:
 - Response DTOs and UI contracts are use-case-private until promoted deliberately.
 - Optional feature-domain aggregators are acceptable only for composing use-case endpoints or routes; use-case behavior still lives in the use-case folders.
 
-## 3. Naming Conventions
+## 3. Runtime Wiring and Persistence Readiness
+
+A slice is not complete when the code compiles; it must also be runnable in the host configuration.
+
+- Every endpoint group or route registry must be registered in the host before the feature is considered complete.
+- A `Map<Feature>Endpoints()` method is incomplete unless the host calls that registration method during startup.
+- Every feature-local `DbContext` must own explicit migration artifacts or a documented migration strategy before startup migration is enabled.
+- Startup migration paths must fail loudly for missing migrations instead of silently bypassing the database schema requirement.
+- Invalid user input must be translated at the API boundary to a validation response (`ValidationProblem` / 400) rather than leaking `ArgumentException` or other domain-validation exceptions as HTTP 500s.
+- Validation must be performed against the normalized domain value, not the raw input string, when the domain canonicalizes identifiers before persistence.
+
+This is an explicit runtime-readiness checklist for all feature slices and should be treated as a merge blocker when unmet.
+
+## 4. Naming Conventions
 
 In the patterns below, `Feature` means the feature-domain name. `Verb<Feature>` means a specific use-case folder inside that feature domain.
 

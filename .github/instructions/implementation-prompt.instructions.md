@@ -48,6 +48,7 @@ Before writing an implementation prompt, gather the minimum evidence:
 - Existing files, instructions, agents, and prompt patterns to reuse
 - Backend, frontend, data, API, test, and demo surfaces affected
 - Risks, constraints, assumptions, and explicit out-of-scope items
+- Runtime-readiness dependencies: host registration, migration strategy, validation semantics, and client-safe error mapping for the slice
 
 Ground the prompt in repository evidence. Reference real files, existing instructions, and current patterns. Do not fill gaps with guesses; mark missing context and define the escalation path instead.
 
