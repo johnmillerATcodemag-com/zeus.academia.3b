@@ -47,10 +47,14 @@ Required review checks:
 
 - Verify every `Map...Endpoints()` call is invoked from the application composition root.
 - Verify a new route or endpoint is reachable at runtime and not just present in a feature file.
+- Verify a route is not considered complete when the host file compiles but the mapper is never called.
 - Verify a host or service registration does not split the same runtime dependency across incompatible configuration sources (for example `ZEUS_SQLSERVER_CONNECTION` and `ConnectionStrings:DefaultConnection`).
 - Verify the migration owner or startup migration path is explicit whenever a feature-local DbContext participates in `Database.MigrateAsync()`.
+- Verify the change includes migration artifacts whenever a feature-local DbContext changes schema.
 - Verify if a number, date, enum, or domain rule is normalized in more than one layer, it is centralized.
 - Verify no business rule is duplicated between a command validator and its handler.
+- Verify the `Try*` contract is respected: a false result must not return a non-null placeholder value.
+- Verify endpoint `Produces*` declarations match actual runtime responses and no validation or conflict failure leaks as a 500.
 - Flag any review gap that would cause a route to be silent, unreachable, or drifted from shared invariants.
 
 ## Skills

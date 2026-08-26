@@ -35,8 +35,21 @@ Standards for implementing feature domains as collections of self-contained use-
 - Placeholder persistence entities are prohibited. Any persistence-bearing model must define a primary key and a valid EF Core configuration before the slice is considered ready.
 - Startup and migration verification must fail explicitly when SQL Server connectivity is unavailable; do not silently skip, swallow, or pass on missing LocalDB/SQL Server prerequisites.
 - Model verification must inspect the actual EF Core model and primary-key shape directly before migration execution; no placeholder, no empty stubs, and no silent pass-through once the model is invalid.
-- A new endpoint group or route registration is not complete until the application host invokes the map method for that feature and the route is reachable at runtime.
-- Any new feature DbContext, model, or schema change must ship with the required migration artifact or an explicit mapping-only waiver; startup `Database.MigrateAsync()` alone does not satisfy readiness without the migration in the repository.
+- Runtime completion gate: every feature route aggregator or `Map...Endpoints()` method must be invoked from the application host or composition root before the slice is considered complete.
+- Validation pipeline gate: if a command/query declares validation behavior, the validator must be registered in DI or the MediatR pipeline and verified as active before completion.
+- Migration ownership gate: any schema change to a feature-local DbContext must include the migration artifacts and host evidence showing migration execution, not just code in the DbContext.
+- Contract parity gate: if an endpoint advertises validation or conflict responses, the runtime must return the declared 4xx response instead of surfacing raw exceptions or 500s.
+
+## Runtime and Integration Completion Checklist
+
+Before a slice is considered ready for review or merge, verify all of the following:
+
+- [ ] Every new `Map...Endpoints()` or endpoint group is called from `Program.cs` or the composition root.
+- [ ] Startup or integration verification confirms the route is reachable at runtime.
+- [ ] Validation is registered and active for any request that advertises validation responses.
+- [ ] Feature-local DbContext schema changes include migration artifacts and explicit migration ownership.
+- [ ] Shared normalization or validation logic is centralized instead of duplicated across handlers, validators, and mappings.
+- [ ] Endpoint `Produces*` contracts match actual runtime responses, especially validation, conflict, and parse failures.
 
 Use the following terms consistently:
 

@@ -42,7 +42,8 @@ tags: [aspnetcore, backend, csharp, api, rest]
 - **Nullable Reference Types**: Enabled project-wide
 - **MediatR Integration**: Use CQRS pattern via MediatR
 - **Host Wiring**: New feature route groups and startup migrations must be mapped/invoked by the application host before the slice is considered complete
-- **Single Source of Truth for Configuration**: Do not split the same runtime dependency across `ZEUS_SQLSERVER_CONNECTION`, `ConnectionStrings:DefaultConnection`, and feature-local configuration defaults when one source is already used by the host. Prefer one canonical source and fail fast with actionable diagnostics when the required value is missing.
+- **Runtime reachability**: A new route is not complete until the host actually invokes the endpoint mapper and startup verification confirms it is reachable
+- **Contract parity**: If an endpoint advertises `.ProducesValidationProblem()`, `.Produces(409)`, or other specific status codes, the runtime must emit the matching response instead of a generic 500 or raw exception
 
 ## File Organization
 
@@ -51,9 +52,8 @@ tags: [aspnetcore, backend, csharp, api, rest]
 - `src/shared/` - Cross-cutting middleware, primitives, and infrastructure abstractions
 - Keep controllers or minimal API extensions close to the use-case they expose
 - Naming: PascalCase for all files matching class names
-- When a minimal API advertises a validation-problem response, catch parse/mapping `ArgumentException` failures and convert them to `Results.ValidationProblem` or another explicit 4xx result instead of letting them surface as a 500
-- If an endpoint declares `.ProducesValidationProblem()`, `.Produces<ValidationProblemDetails>(400)`, or equivalent, all guard/parse/domain-creation failures that represent invalid input must be converted to a validation response before returning; a bubbling `ArgumentException` is a contract failure
-- Endpoint completion is not valid until the route group is mapped in the application host and the route is reachable at runtime
+- When a minimal API advertises a validation-problem response, catch parse/mapping `ArgumentException`, `ValidationException`, and business-conflict failures and convert them to `Results.ValidationProblem(...)`, `Results.Conflict(...)`, or another explicit 4xx/409 result instead of letting them surface as a 500
+- Do not leave a route `Map...Endpoints()` method defined in a feature file unless the app host actually calls it.
 
 ## Standard Patterns
 
