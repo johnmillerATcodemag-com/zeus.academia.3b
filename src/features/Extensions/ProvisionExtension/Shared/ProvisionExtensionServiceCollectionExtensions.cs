@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,8 @@ public static class ProvisionExtensionServiceCollectionExtensions
   public static IServiceCollection AddProvisionExtensionMediatR(
       this IServiceCollection services)
   {
+    services.AddValidatorsFromAssembly(typeof(ProvisionExtensionDbContext).Assembly);
+
     services.AddMediatR(cfg =>
         cfg.RegisterServicesFromAssembly(typeof(ProvisionExtensionDbContext).Assembly));
 
