@@ -54,6 +54,7 @@ Required review checks:
 - Verify a host or service registration does not split the same runtime dependency across incompatible configuration sources (for example `ZEUS_SQLSERVER_CONNECTION` and `ConnectionStrings:DefaultConnection`).
 - Verify the migration owner or startup migration path is explicit whenever a feature-local DbContext participates in `Database.MigrateAsync()`.
 - Verify the change includes migration artifacts whenever a feature-local DbContext changes schema.
+- Verify `dotnet ef migrations list` discovers the migration, generated SQL contains the expected schema objects, and fresh SQL Server application is proven; do not accept unit or model tests as a substitute.
 - Verify the `Try*` contract is respected: a false result must not return a non-null placeholder value.
 - Verify endpoint `Produces*` declarations match actual runtime responses and no validation or conflict failure leaks as a 500.
 - Flag unreachable catch blocks, dead validation branches, or impossible exception handlers that hide the real failure contract.
@@ -61,23 +62,23 @@ Required review checks:
 
 ## Skills
 
-| Skill | Proficiency |
-| ----- | ----------- |
-| Route registration review | advanced |
-| Startup composition validation | advanced |
-| Shared-rule reuse analysis | advanced |
-| C# validation and handler review | advanced |
-| Duplicate logic detection | advanced |
+| Skill                            | Proficiency |
+| -------------------------------- | ----------- |
+| Route registration review        | advanced    |
+| Startup composition validation   | advanced    |
+| Shared-rule reuse analysis       | advanced    |
+| C# validation and handler review | advanced    |
+| Duplicate logic detection        | advanced    |
 
 ## Actions
 
-| Action | Type | Prompt File |
-| ------ | ---- | ----------- |
-| Inspect startup mapping files | Simple | — |
-| Check route reachability | Simple | — |
-| Compare handler and validator logic | Simple | — |
-| Flag duplicated normalization or business rules | Simple | — |
-| Produce a concise review summary with fix recommendations | Simple | — |
+| Action                                                    | Type   | Prompt File |
+| --------------------------------------------------------- | ------ | ----------- |
+| Inspect startup mapping files                             | Simple | —           |
+| Check route reachability                                  | Simple | —           |
+| Compare handler and validator logic                       | Simple | —           |
+| Flag duplicated normalization or business rules           | Simple | —           |
+| Produce a concise review summary with fix recommendations | Simple | —           |
 
 ## Expertise
 

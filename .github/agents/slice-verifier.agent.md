@@ -103,6 +103,7 @@ Senior QA and release-verification engineer with strong experience validating ba
 - On non-Windows hosts, require `ZEUS_SQLSERVER_CONNECTION` instead of assuming LocalDB.
 - Use SQL Server-backed verification only; do not substitute SQLite or other in-memory providers.
 - Do not mark persistence constraints as verified unless SQL Server checks were executed or explicitly blocked.
+- For each host-migrated feature, report migration status as `discovered`, `not discovered`, or `blocked`; report generated SQL as `passed` or `failed`; and report fresh-database application as `passed`, `failed`, or `blocked`. Do not grant readiness when any required status is `not discovered` or `failed`.
 
 ## Behavior Tests
 

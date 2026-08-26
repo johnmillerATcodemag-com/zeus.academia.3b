@@ -119,6 +119,7 @@ mode: agent
 - Endpoint registration is located in the host composition boundary and invokes feature endpoint aggregators.
 - Design-time and runtime DbContext configuration use the same SQL Server and platform-guard rules.
 - Migration artifacts are complete as a set: migration class, Designer metadata, and model snapshot.
+- Migration readiness is executable: for every host-migrated DbContext, `dotnet ef migrations list` discovers the expected migration, generated SQL contains the expected tables and constraints, and the migration applies successfully to a fresh SQL Server database.
 - No duplicate project declarations or duplicate migration ownership exists.
 - Tests and verification commands fail explicitly when SQL Server prerequisites are unavailable; they do not silently skip.
 - Existing Shared Kernel tests and all touched feature tests pass.
@@ -142,5 +143,6 @@ mode: agent
 - [ ] `ProvisionExtensionDbContext` exclusively owns `Extensions` migrations.
 - [ ] Runtime and design-time SQL Server configuration agree.
 - [ ] Complete migration metadata is committed for each schema-changing context.
+- [ ] EF migration discovery, generated SQL, and fresh SQL Server application have been verified for every host-migrated context.
 - [ ] No duplicate DbContext migration ownership exists.
 - [ ] Host, route, migration, and prerequisite verification evidence is captured.

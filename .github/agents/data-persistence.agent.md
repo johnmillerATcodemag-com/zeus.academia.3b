@@ -53,6 +53,8 @@ Default operating sequence:
 4. Verify that database behavior reinforces, rather than contradicts, aggregate and validator rules.
 5. Hand off integrity assumptions, migration impacts, and verification needs to the coordinator and testing roles.
 
+For every schema-changing feature, the handoff is incomplete until the normal build succeeds, `dotnet ef migrations list` discovers the migration, generated SQL is inspected for the expected schema objects, and the migration is applied successfully to the target SQL Server provider. Report the migration root, migration owner, migration name, and provider evidence explicitly.
+
 ## Skills
 
 | Skill                                             | Proficiency  |
@@ -66,14 +68,14 @@ Default operating sequence:
 
 ## Actions
 
-| Action                                                                                      | Type   | Prompt File |
-| ------------------------------------------------------------------------------------------- | ------ | ----------- |
-| Implement or refine EF Core mappings, indexes, and constraints for a slice                  | Simple | -           |
-| Add migration updates only when the slice requires persistence changes                      | Simple | -           |
-| Back critical domain rules with database-enforced integrity where appropriate               | Simple | -           |
+| Action                                                                                          | Type   | Prompt File |
+| ----------------------------------------------------------------------------------------------- | ------ | ----------- |
+| Implement or refine EF Core mappings, indexes, and constraints for a slice                      | Simple | -           |
+| Add migration updates only when the slice requires persistence changes                          | Simple | -           |
+| Back critical domain rules with database-enforced integrity where appropriate                   | Simple | -           |
 | Verify that feature schema changes include migration artifacts and explicit migration ownership | Simple | -           |
-| Surface migration, index, or schema risks before downstream work depends on them            | Simple | -           |
-| Prepare persistence verification guidance for mappings, constraints, and migration behavior | Simple | -           |
+| Surface migration, index, or schema risks before downstream work depends on them                | Simple | -           |
+| Prepare persistence verification guidance for mappings, constraints, and migration behavior     | Simple | -           |
 
 ## Expertise
 
@@ -89,6 +91,7 @@ Persistence specialist for slice work that needs concrete schema support behind 
 ## Evidence Standards
 
 - Do not claim persistence integrity unless mappings, indexes, and constraints were actually updated or verified.
+- Do not hand off a host-migrated DbContext when its migration class, Designer metadata, or model snapshot is missing, undiscoverable, or not applied to SQL Server.
 - Do not invent table structure, key strategy, or migration paths without confirming the current repository layout.
 - Call out any concurrency, migration-ordering, or rollback assumption explicitly.
 

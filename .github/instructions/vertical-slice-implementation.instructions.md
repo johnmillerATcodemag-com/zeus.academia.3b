@@ -43,6 +43,8 @@ Standards for implementing feature domains as collections of self-contained use-
 - Runtime completion gate: every feature route aggregator or `Map...Endpoints()` method must be invoked from the application host or composition root before the slice is considered complete.
 - Validation pipeline gate: if a command/query declares validation behavior, the validator must be registered in DI or the MediatR pipeline and verified as active before completion.
 - Migration ownership gate: any schema change to a feature-local DbContext must include the migration artifacts and host evidence showing migration execution, not just code in the DbContext.
+- Migration readiness gate: when the host invokes `Database.MigrateAsync()` for a feature DbContext, the owning project must contain a migration class, matching Designer metadata, and model snapshot under its named migration root. Verification must run `dotnet ef migrations list`, generate a migration script, and apply the migration to a fresh SQL Server database; a passing model test, build, or unit test alone is insufficient.
+- Migration discovery failure: a feature is blocked when `dotnet ef migrations list` reports no migrations for a host-migrated DbContext, when the generated script omits expected schema objects, or when the migration cannot be applied to the target SQL Server provider.
 - Contract parity gate: if an endpoint advertises validation or conflict responses, the runtime must return the declared 4xx response instead of surfacing raw exceptions or 500s.
 
 ## Runtime and Integration Completion Checklist
@@ -53,6 +55,7 @@ Before a slice is considered ready for review or merge, verify all of the follow
 - [ ] Startup or integration verification confirms the route is reachable at runtime.
 - [ ] Validation is registered and active for any request that advertises validation responses.
 - [ ] Feature-local DbContext schema changes include migration artifacts and explicit migration ownership.
+- [ ] EF discovers the feature migration, generated SQL contains the expected schema objects, and a fresh SQL Server database accepts the migration.
 - [ ] Shared normalization or validation logic is centralized instead of duplicated across handlers, validators, and mappings.
 - [ ] Endpoint `Produces*` contracts match actual runtime responses, especially validation, conflict, and parse failures.
 

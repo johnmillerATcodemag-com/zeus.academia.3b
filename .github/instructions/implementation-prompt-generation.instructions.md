@@ -197,7 +197,6 @@ The prompt MUST explicitly require proof that the slice is complete in the appli
 - New validators include direct tests for required, range, whole-number, and success cases, and invalid input tests verify the endpoint contract is preserved.
 - Unreachable exception handlers or dead catch blocks are not accepted when the real validation path already exists.
 
-
 - observable
 - testable
 - scoped to the slice outcome, not the implementation task list
@@ -234,6 +233,7 @@ The section MUST cover, when applicable:
 - ownership-safe association mutations (for example, releasing an extension must validate it belongs to the target academic; assignment must not overwrite an existing different assignment)
 - EF Core migration hygiene when schema changes are part of the slice (required migration artifacts, model snapshot, and metadata files must be part of the deliverable unless explicitly waived)
 - EF Core migration artifact completeness when schema changes are part of the slice (never commit snapshot-only metadata; require migration class, Designer metadata, and snapshot as one coherent set unless explicitly waived as mapping-only)
+- Executable migration evidence when the host invokes `Database.MigrateAsync()`: require `dotnet ef migrations list`, generated SQL inspection, and successful application to a fresh SQL Server database; unit or model tests alone are insufficient.
 - persistence-exception translation specificity (only translate `DbUpdateException` or equivalent persistence failures into business conflicts when the exact conflict is proven or provider handling is narrow enough to avoid masking unrelated failures)
 - model metadata testing that inspects `context.Model` directly rather than relying on `IDesignTimeModel` from the service provider in normal tests
 - migration metadata integrity checks that fail verification when snapshot, migration class, and Designer files are not committed together for schema-changing work
@@ -335,6 +335,7 @@ End the prompt with a checklist that verifies prompt quality before use.
 - [ ] Result semantics explicitly reserve `Error.None` for success and forbid empty-error failures.
 - [ ] Prompted factory-enforced invariants keep constructors non-public so validation cannot be bypassed.
 - [ ] Schema-changing prompts require migration artifacts and metadata hygiene for EF Core work.
+- [ ] Host-migrated contexts have named EF discovery, generated-SQL, and fresh SQL Server application checks.
 - [ ] Model metadata checks use the EF Core model directly rather than a design-time service lookup in normal tests.
 - [ ] Domain exception types are organized into dedicated files/types with aligned names.
 - [ ] Prompted C# changes keep one primary type per file and preserve filename-to-type alignment.

@@ -72,6 +72,7 @@ applyTo: "**"
   - Do not commit a standalone EF Core model snapshot; when migrations are in scope, include the migration class plus its Designer metadata alongside the snapshot (or omit all migration artifacts when explicitly waived as mapping-only).
   - If a slice introduces or changes route groups, verify the application host maps them explicitly before review; do not rely on implicit discovery.
   - If the application host calls `Database.MigrateAsync()` for a feature DbContext, ensure the feature includes matching migration artifacts or the migration owner is explicitly documented.
+  - For every host-migrated feature DbContext, run `dotnet ef migrations list` and verify it discovers at least one migration; generate migration SQL and confirm it contains the expected tables and constraints. Treat “No migrations were found” or failed fresh-database application as a blocking defect.
   - When a canonical domain helper normalizes input before validation, run length/shape checks on the normalized value rather than the raw string.
   - Do not use `null!` to satisfy failing lookup helpers; nullable out values are required when the failure path is real.
   - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.

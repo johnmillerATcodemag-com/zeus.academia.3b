@@ -86,9 +86,9 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: query returns stable reference data for registration and qualification flows.
 5. Verify the slice.
-   Targets: validator tests, handler tests, integration tests.
+   Targets: validator tests, handler tests, SQL Server migration checks, and integration tests.
    Owner: testing-verification.
-   Validation before next step: add and list flows pass with clear failure coverage, and canonical code rules stay aligned across validator, mapping, and persistence behavior.
+   Validation before next step: add and list flows pass with clear failure coverage, `dotnet ef migrations list` discovers the feature migration, generated SQL contains the `Universities` table and `CK_Universities_Code_Allowed`, and a fresh SQL Server database accepts the migration.
 
 ## Verification and Acceptance Criteria
 
@@ -106,6 +106,7 @@ mode: agent
 - Guard failures for invalid or malformed university input identify the `Code` property rather than the enclosing command object.
 - Minimal API endpoints that advertise validation-problem responses must translate `ArgumentException` and validation-style mapping failures into `Results.ValidationProblem` or an equivalent 4xx result instead of bubbling a 500.
 - If the host migrates this DbContext at startup, the feature must include the migration artifacts or the prompt must explicitly name a different migration owner.
+- Because the host invokes `ManageUniversitiesDbContext.Database.MigrateAsync()`, this slice must include a complete migration set under `src/features/ReferenceData/ManageUniversities/Shared/Migrations/`: migration class, matching Designer metadata, and `ManageUniversitiesDbContextModelSnapshot.cs`. “No migrations were found” blocks completion.
 - Nullable lookup helpers must expose their failure path with nullable types; do not use `null!` to satisfy a non-nullable out parameter.
 - Adding a university code creates one canonical reference-data record.
 - Duplicate university codes are rejected without partial persistence.

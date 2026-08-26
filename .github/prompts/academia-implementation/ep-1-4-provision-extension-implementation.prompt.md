@@ -76,9 +76,9 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: assigned extensions cannot be deprovisioned and unassigned ones can.
 4. Verify command behavior end to end.
-   Targets: validator tests, handler tests, feature-local model tests, SQL Server migration tests, and integration tests for provision, duplicate rejection, and deprovision guards.
+   Targets: validator tests, handler tests, feature-local model tests, SQL Server migration checks, and integration tests for provision, duplicate rejection, and deprovision guards.
    Owner: testing-verification.
-   Validation before next step: extension pool behavior is reliable enough for registration to depend on it.
+   Validation before next step: `dotnet ef migrations list` discovers the feature migration, generated SQL matches the `Extensions` model, a fresh SQL Server database accepts the migration, and extension-pool behavior is reliable enough for registration to depend on it.
 
 ## Verification and Acceptance Criteria
 
@@ -89,6 +89,7 @@ mode: agent
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - `ProvisionExtensionDbContext` is feature-local and is the sole migration owner for the `Extensions` table.
+- The feature must include a complete migration set under `src/features/Extensions/ProvisionExtension/Shared/Migrations/`: migration class, matching Designer metadata, and model snapshot. Verification must record the provider and connection source used; “No migrations were found” or failed fresh-database application blocks completion.
 - The context maps the Shared Kernel `Extension` entity and reuses `ExtensionConfiguration` semantics; no `ExtensionRecord`, duplicate entity, or competing Shared Kernel migration is introduced.
 - Provisioning accepts only valid numeric extension values and persists a unique extension record.
 - Provisioning the same extension twice fails without creating duplicates.

@@ -48,7 +48,7 @@ tags: [xunit, testing, csharp, backend, unit-tests, integration-tests]
 
 - Model verification tests SHOULD inspect the EF Core `IModel` via `DbContext.Model` directly rather than using `context.GetService<IDesignTimeModel>()` in ordinary unit tests.
 - When a test asserts on keys, indexes, or check constraints, it should target the model metadata that the context actually exposes rather than a design-time service dependency.
-- Schema or migration assertions SHOULD verify the intended model shape and the emitted migration output, not only an in-memory database configuration.
+- Schema or migration assertions MUST verify the intended model shape and emitted migration output, not only an in-memory database configuration. When the host applies migrations for the context, verification MUST also prove that EF discovers the migration and can apply it to SQL Server.
 
 ## Database Test Safety
 
@@ -67,6 +67,7 @@ builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 - Tests that create external resources (SQL databases, containers, queues, files, temp schemas) MUST clean them up in a `finally` block.
 - SQL Server tests that use per-test database names MUST run best-effort `EnsureDeletedAsync()` teardown even when assertions fail.
 - Cleanup failures SHOULD surface as warnings when possible, but must not hide the original assertion failure.
+- EF Core InMemory tests may support fast handler tests, but they are not persistence evidence. Persistence-bearing slices require a SQL Server-backed migration or integration check; missing provider evidence is a review blocker.
 
 ## Validator and Endpoint Contract Coverage
 

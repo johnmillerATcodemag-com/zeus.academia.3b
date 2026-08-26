@@ -58,15 +58,15 @@ Before implementation is considered ready:
 
 ## Artifact Map
 
-| Surface                   | Owned artifacts                                                                                                                                                                            |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Feature root              | `src/features/ReferenceData/ManageUniversities/`                                                                                                                                           |
-| Add use case              | `AddUniversity/AddUniversityCommand.cs`, `AddUniversityCommandValidator.cs`, `AddUniversityHandler.cs`, `AddUniversityResponse.cs`, `AddUniversityEndpoint.cs`, `AddUniversityMappings.cs` |
-| List use case             | `ListUniversities/ListUniversitiesQuery.cs`, `ListUniversitiesHandler.cs`, `ListUniversitiesResponse.cs`, `ListUniversitiesEndpoint.cs`                                                    |
-| Slice support             | `Shared/UniversityRecord.cs`, canonical university-code catalog, conflict exception, `ManageUniversitiesDbContext.cs`, EF configuration                                                    |
-| Project                   | `Zeus.Academia.Features.ReferenceData.ManageUniversities.csproj`                                                                                                                           |
-| Tests                     | `tests/Features/ReferenceData/ManageUniversities/` with validator, add-handler, list-handler, model, and project files                                                                     |
-| Optional schema artifacts | Migration class, Designer metadata, and model snapshot under the chosen migration root, only after migration ownership is confirmed                                                        |
+| Surface                   | Owned artifacts                                                                                                                                                                              |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Feature root              | `src/features/ReferenceData/ManageUniversities/`                                                                                                                                             |
+| Add use case              | `AddUniversity/AddUniversityCommand.cs`, `AddUniversityCommandValidator.cs`, `AddUniversityHandler.cs`, `AddUniversityResponse.cs`, `AddUniversityEndpoint.cs`, `AddUniversityMappings.cs`   |
+| List use case             | `ListUniversities/ListUniversitiesQuery.cs`, `ListUniversitiesHandler.cs`, `ListUniversitiesResponse.cs`, `ListUniversitiesEndpoint.cs`                                                      |
+| Slice support             | `Shared/UniversityRecord.cs`, canonical university-code catalog, conflict exception, `ManageUniversitiesDbContext.cs`, EF configuration                                                      |
+| Project                   | `Zeus.Academia.Features.ReferenceData.ManageUniversities.csproj`                                                                                                                             |
+| Tests                     | `tests/Features/ReferenceData/ManageUniversities/` with validator, add-handler, list-handler, model, and project files                                                                       |
+| Required schema artifacts | Migration class, Designer metadata, and model snapshot under `src/features/ReferenceData/ManageUniversities/Shared/Migrations/`; required because the host invokes `Database.MigrateAsync()` |
 
 ## Route Decision
 
@@ -116,6 +116,7 @@ The approved resolution contract is now implemented: `University.Code` is the im
 - Model tests: primary key, field length, requiredness, and absence of duplicate PK unique index.
 - SQL Server verification: generated schema or migration output must be checked against the target provider.
 - Integration tests that provision a database must use an isolated test database and best-effort cleanup in `finally` blocks.
+- EF verification must run `dotnet ef migrations list` and fail if no migration is discovered. Generated SQL must include the `Universities` table, `PK_Universities`, and `CK_Universities_Code_Allowed`; a fresh SQL Server migration application must succeed before handoff.
 
 ## Allowed File Set
 
