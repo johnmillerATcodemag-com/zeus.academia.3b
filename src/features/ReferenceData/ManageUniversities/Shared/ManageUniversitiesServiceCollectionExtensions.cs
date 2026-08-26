@@ -1,7 +1,9 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
@@ -55,6 +57,8 @@ if (string.IsNullOrWhiteSpace(connectionString))
   {
     services.AddMediatR(cfg =>
         cfg.RegisterServicesFromAssembly(typeof(ManageUniversitiesDbContext).Assembly));
+
+    services.AddScoped<IValidator<AddUniversityCommand>, AddUniversityCommandValidator>();
 
     return services;
   }
