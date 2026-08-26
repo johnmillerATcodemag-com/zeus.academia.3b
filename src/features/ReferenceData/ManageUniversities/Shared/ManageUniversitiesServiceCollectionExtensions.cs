@@ -1,6 +1,5 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
@@ -19,28 +18,9 @@ public static class ManageUniversitiesServiceCollectionExtensions
   /// </summary>
   public static IServiceCollection AddManageUniversitiesPersistence(
       this IServiceCollection services,
-      IConfiguration configuration)
+      string connectionString)
   {
-    var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
-
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-      connectionString = configuration.GetConnectionString("DefaultConnection");
-    }
-
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-      if (OperatingSystem.IsWindows())
-      {
-        connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Zeus_Academia_Dev;Integrated Security=True;TrustServerCertificate=True;";
-      }
-      else
-      {
-        throw new InvalidOperationException(
-          "SQL Server connection string not found. Set ZEUS_SQLSERVER_CONNECTION environment variable or add ConnectionStrings:DefaultConnection to appsettings.json. " +
-          "LocalDB is only available on Windows; configure a SQL Server connection string for non-Windows environments.");
-      }
-    }
+    ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
 
     services.AddDbContext<ManageUniversitiesDbContext>(options =>
         options.UseSqlServer(connectionString));

@@ -74,19 +74,19 @@ builder.Services.AddDbContext<SharedKernelDbContext>(options =>
   options.UseSqlServer(connectionString));
 
 // Feature 1: Manage Ranks (Phase 0)
-builder.Services.AddManageRanksPersistence(builder.Configuration);
+builder.Services.AddManageRanksPersistence(connectionString);
 builder.Services.AddManageRanksMediatR();
 
 // Feature 2: Manage Degrees (Phase 0)
-builder.Services.AddManageDegreesPersistence(builder.Configuration);
+builder.Services.AddManageDegreesPersistence(connectionString);
 builder.Services.AddManageDegreesMediatR();
 
 // Feature 3: Manage Universities (Phase 1 ownership path)
-builder.Services.AddManageUniversitiesPersistence(builder.Configuration);
+builder.Services.AddManageUniversitiesPersistence(connectionString);
 builder.Services.AddManageUniversitiesMediatR();
 
 // Feature 4: Provision Extension (sole migration owner for Extensions)
-builder.Services.AddProvisionExtensionPersistence(builder.Configuration);
+builder.Services.AddProvisionExtensionPersistence(connectionString);
 builder.Services.AddProvisionExtensionMediatR();
 
 // ============================================================================

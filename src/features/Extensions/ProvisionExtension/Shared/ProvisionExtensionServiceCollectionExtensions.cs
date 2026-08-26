@@ -1,6 +1,5 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Zeus.Academia.Features.Extensions.ProvisionExtension;
@@ -18,9 +17,9 @@ public static class ProvisionExtensionServiceCollectionExtensions
   /// </summary>
   public static IServiceCollection AddProvisionExtensionPersistence(
       this IServiceCollection services,
-      IConfiguration configuration)
+      string connectionString)
   {
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
 
     services.AddDbContext<ProvisionExtensionDbContext>(options =>
         options.UseSqlServer(connectionString));

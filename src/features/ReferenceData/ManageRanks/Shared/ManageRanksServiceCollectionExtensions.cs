@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 
@@ -13,20 +12,16 @@ public static class ManageRanksServiceCollectionExtensions
 {
   /// <summary>
   /// Registers the ManageRanksDbContext with the service collection.
-  /// The connection string is resolved from configuration with environment-based fallback.
+  /// The connection string is resolved by the application host and shared by all contexts.
   /// </summary>
   /// <param name="services">The service collection to register services into.</param>
-  /// <param name="configuration">The application configuration containing connection strings.</param>
+  /// <param name="connectionString">The SQL Server connection string resolved by the application host.</param>
   /// <returns>The service collection for chaining.</returns>
   public static IServiceCollection AddManageRanksPersistence(
     this IServiceCollection services,
-    IConfiguration configuration)
+    string connectionString)
   {
-    var connectionString = configuration.GetConnectionString("DefaultConnection") ??
-                          Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION") ??
-                          throw new InvalidOperationException(
-                            "No connection string found for Manage Ranks persistence. " +
-                            "Configure ConnectionStrings:DefaultConnection in appsettings.json or set ZEUS_SQLSERVER_CONNECTION environment variable.");
+    ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
 
     services.AddDbContext<ManageRanksDbContext>(options =>
       options.UseSqlServer(connectionString));
