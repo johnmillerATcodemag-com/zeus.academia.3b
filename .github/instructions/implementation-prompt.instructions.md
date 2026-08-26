@@ -57,8 +57,6 @@ Every implementation prompt must explicitly require the implementation team to d
 
 - confirm that every new route or endpoint aggregator is registered in the application startup/composition root
 - verify runtime reachability rather than assuming a compile-only success
-- use one canonical configuration source for any runtime dependency the host already resolves (for example, do not split the same SQL Server setting across `ZEUS_SQLSERVER_CONNECTION` and `ConnectionStrings:DefaultConnection`)
-- verify any feature-local DbContext used in `Database.MigrateAsync()` declares migration ownership and startup invocation explicitly
 - reuse any existing numeric normalization, validation, or conflict rules instead of duplicating them across validators and handlers
 - check neighboring slices and shared helper files for single-source-of-truth logic before new rules are introduced
 
@@ -87,7 +85,6 @@ Include layer-specific instructions for every touched surface. At minimum:
 - Pinia: `.github/instructions/pinia-implementation.instructions.md`
 - backend tests: `.github/instructions/xunit-implementation.instructions.md`
 - frontend tests: `.github/instructions/vitest-implementation.instructions.md`
-- For any new endpoint group, route registration, identity normalization, or persistence model, explicitly list the exact host wiring, validation contract, and migration artifacts required before the slice is considered complete
 
 ## Agent-Oriented Roles
 

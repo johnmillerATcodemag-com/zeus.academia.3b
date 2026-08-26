@@ -71,6 +71,10 @@ applyTo: "**"
   - Any EF Core model, configuration, or `DbSet` addition that changes schema ships with the matching migration artifacts and updated model snapshot unless the change is explicitly documented as mapping-only.
   - Do not commit a standalone EF Core model snapshot; when migrations are in scope, include the migration class plus its Designer metadata alongside the snapshot (or omit all migration artifacts when explicitly waived as mapping-only).
   - If a slice introduces or changes route groups, verify the application host maps them explicitly before review; do not rely on implicit discovery.
+  - If a feature defines a `Map*Endpoints(this IEndpointRouteBuilder app)` aggregator, maintain an automated host-composition guard test that fails when `Program.cs` does not call the matching `app.Map*Endpoints()` method.
+  - If an endpoint advertises `ProducesValidationProblem()` or equivalent validation responses, verify every normalization/argument exception from the handler, mapper, or factory is converted into `Results.ValidationProblem(...)` (or equivalent) rather than leaking as a 500.
+  - If a numeric/date/enum value is normalized or range-checked in multiple layers, centralize the rule in one shared helper or domain primitive; do not duplicate equivalent logic across validators, handlers, and mapping code.
+  - Do not keep unreachable `catch` blocks for impossible exceptions; if the code path cannot throw due to earlier guards, remove the dead catch and rely on the actual validation path.
   - If the application host calls `Database.MigrateAsync()` for a feature DbContext, ensure the feature includes matching migration artifacts or the migration owner is explicitly documented.
   - When a canonical domain helper normalizes input before validation, run length/shape checks on the normalized value rather than the raw string.
   - Do not use `null!` to satisfy failing lookup helpers; nullable out values are required when the failure path is real.
