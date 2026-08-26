@@ -58,6 +58,7 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 - MUST centralize numeric/date/enum coercion and range rules in one shared helper or value object, and require handlers, validators, and mapping helpers to reuse that canonical logic instead of re-implementing equivalent checks
 - MUST name the canonical factory or value object that owns each constrained numeric/date/enum invariant. Validators may adapt its exceptions for request-specific errors, and handlers must invoke the same canonical API before mutation; command-local normalization helpers may delegate but must not duplicate the algorithm.
 - MUST add direct boundary tests for any changed public factory or value object, including valid conversion, range failures, and rejection of lossy coercion.
+- MUST model lookup absence explicitly with nullable fields or a dedicated result type; do not use `null!`, default placeholders, or ambiguous success flags for failed resolution.
 - MUST NOT keep unreachable `catch` blocks for impossible exceptions; if range checks or earlier guards make a failure impossible, remove the dead catch and rely on the real validation path
 
 **Template:**

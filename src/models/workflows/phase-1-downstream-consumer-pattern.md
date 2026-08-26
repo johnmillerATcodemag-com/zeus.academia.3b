@@ -74,6 +74,8 @@ Phase 0 Foundation
     └── ProvisionExtensionDbContext (owns Extensions table)
 ```
 
+`GetUniversityByCodeQuery` is an implemented public MediatR contract owned by `ManageUniversities`. Downstream slices must resolve university codes through this contract and must not reference `ManageUniversitiesDbContext` or `UniversityRecord` directly.
+
 ## Canonical Integration Steps (All Downstream Slices)
 
 ### Step 1: Define Commands
@@ -141,8 +143,8 @@ public class RecordQualificationCommandHandler : IRequestHandler<RecordQualifica
         // 4. Resolve rank if needed (same pattern)
         // (Omitted for brevity; follow steps 1-3)
 
-        // 5. Create domain value objects from resolved catalog responses
-        // The catalog provides the CODE; we create value objects with those codes
+        // 5. Create domain value objects from resolved catalog responses.
+        // The catalog provides the CODE; use it rather than the display name.
         var degreeVo = Degree.Create(degreeResponse.Code!);  // Code is guaranteed non-null after validation
         var universityVo = University.Create(universityResponse.Code!);
 

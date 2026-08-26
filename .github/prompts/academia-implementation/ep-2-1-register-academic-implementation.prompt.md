@@ -51,6 +51,7 @@ mode: agent
 - Required prior slices: ManageRanks, ManageDegrees, ManageUniversities, ProvisionExtension
 - Blocking risks: this slice is the first hard dependency gate; do not parallelize dependent slices until registration passes integration tests.
 - Existing patterns to reuse: command validator beside handler, atomic persistence, rank-derived access-level logic from Shared Kernel, and extension uniqueness backed by database constraints.
+- University resolution must use `GetUniversityByCodeQuery` from ManageUniversities. Do not inject `ManageUniversitiesDbContext` or reference `UniversityRecord` directly.
 
 ## Assigned Agents and Role Boundaries
 
@@ -69,7 +70,7 @@ mode: agent
 2. Implement the registration contract and validator.
    Targets: RegisterAcademic command, request/response types, validator, and mapping helpers.
    Owner: backend-domain.
-   Validation before next step: empNr length, EmpName length, qualification minimum, and extension availability are all validated before persistence, and field limits stay aligned with the canonical persistence/domain constraint definitions.
+   Validation before next step: empNr length, EmpName length, qualification minimum, and extension availability are all validated before persistence, university resolution checks `IsFound` then `IsActive`, and field limits stay aligned with the canonical persistence/domain constraint definitions.
 3. Implement the handler and endpoint atomically.
    Targets: handler, endpoint, persistence mapping, and transaction flow for academic creation, qualification creation, and extension linkage.
    Owner: backend-domain.
@@ -91,6 +92,7 @@ mode: agent
 - A valid registration request creates one academic record with a 6-character unique empNr and a name no longer than 15 characters.
 - Registration rejects payloads that do not include at least one degree and university pair.
 - Registration rejects invalid rank, degree, university, or extension references.
+- Registration resolves university codes through `GetUniversityByCodeQuery`, checks found before active state, and persists the canonical code rather than the display name.
 - Registration uses an unassigned extension only and persists the rank-derived access level automatically.
 - Automated tests cover the happy path plus duplicate empNr, invalid reference data, missing qualification, and extension-conflict failures.
 
@@ -113,6 +115,7 @@ mode: agent
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] RegisterAcademic remains the first delivery gate for academic lifecycle work.
 - [ ] Validation covers empNr length, name length, qualification minimum, and reference-data existence.
+- [ ] University resolution uses the public ManageUniversities query contract without direct feature-persistence coupling.
 - [ ] Field-limit and normalization rules stay aligned between validators/domain logic and persistence mappings.
 - [ ] Persistence is atomic across academic, qualifications, and extension linkage.
 - [ ] Derived access level is persisted or exposed consistently from Rank.

@@ -272,12 +272,12 @@ public class UniversityRecordConfiguration : IEntityTypeConfiguration<University
 
 ### 4. GetUniversityByCodeQuery & Handler
 
-**Location**: `src/features/ReferenceData/ManageUniversities/Shared/Queries/GetUniversityByCodeQuery.cs`
+**Location**: `src/features/ReferenceData/ManageUniversities/GetUniversityByCode/GetUniversityByCodeQuery.cs`
 
 **Definition**:
 
 ```csharp
-namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared.Queries;
+namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.GetUniversityByCode;
 
 using MediatR;
 
@@ -286,14 +286,14 @@ using MediatR;
 /// Called by downstream slices to fetch catalog data before creating domain value objects.
 /// Designed for downstream resolution: input code → validate in catalog → return response.
 /// </summary>
-public record GetUniversityByCodeQuery(string Code) : IRequest<GetUniversityByCodeResponse>;
+public sealed record GetUniversityByCodeQuery(string Code) : IRequest<GetUniversityByCodeResponse>;
 
 /// <summary>
 /// Response from GetUniversityByCodeQuery.
 /// Always returns a response object (never throws exceptions for "not found").
 /// Allows callers to distinguish "not found" from "inactive".
 /// </summary>
-public record GetUniversityByCodeResponse(
+public sealed record GetUniversityByCodeResponse(
     /// <summary>True if the code exists in the catalog.</summary>
     bool IsFound,
 
@@ -311,7 +311,7 @@ public record GetUniversityByCodeResponse(
 **Handler Implementation**:
 
 ```csharp
-namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared.Queries;
+namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.GetUniversityByCode;
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -321,14 +321,14 @@ using Microsoft.EntityFrameworkCore;
 /// Queries the catalog and returns the university record (if found).
 /// Never throws exceptions; all outcomes are communicated via response object.
 /// </summary>
-public class GetUniversityByCodeQueryHandler : IRequestHandler<GetUniversityByCodeQuery, GetUniversityByCodeResponse>
+public sealed class GetUniversityByCodeHandler : IRequestHandler<GetUniversityByCodeQuery, GetUniversityByCodeResponse>
 {
-    private readonly ManageUniversitiesDbContext _context;
+    private readonly ManageUniversitiesDbContext _dbContext;
 
-    public GetUniversityByCodeQueryHandler(ManageUniversitiesDbContext context)
+    public GetUniversityByCodeHandler(ManageUniversitiesDbContext dbContext)
     {
-        ArgumentNullException.ThrowIfNull(context);
-        _context = context;
+        ArgumentNullException.ThrowIfNull(dbContext);
+        _dbContext = dbContext;
     }
 
     public async Task<GetUniversityByCodeResponse> Handle(
@@ -338,9 +338,22 @@ public class GetUniversityByCodeQueryHandler : IRequestHandler<GetUniversityByCo
         ArgumentNullException.ThrowIfNull(request);
 
         // Query database by Code (case-insensitive, since codes are normalized)
-        var normalizedCode = (request.Code ?? string.Empty).Trim().ToUpperInvariant();
+        string normalizedCode;
 
-        var record = await _context.Universities
+        try
+        {
+            normalizedCode = University.Create(request.Code).Code;
+        }
+        catch (ArgumentException)
+        {
+            return new GetUniversityByCodeResponse(
+                IsFound: false,
+                Code: null,
+                Name: null,
+                IsActive: false);
+        }
+
+        var record = await _dbContext.Universities
             .AsNoTracking()
             .FirstOrDefaultAsync(
                 u => u.Code == normalizedCode,
@@ -371,7 +384,7 @@ public class GetUniversityByCodeQueryHandler : IRequestHandler<GetUniversityByCo
 - [ ] Accept `string Code` (nullable or empty is OK; handle gracefully)
 - [ ] Normalize input code to uppercase before query
 - [ ] Query `ManageUniversitiesDbContext.Universities`
-- [ ] Use `FirstOrDefaultAsync` to find matching record
+- [ ] Use `SingleOrDefaultAsync` to find matching record
 - [ ] Return response object (never throw for "not found")
 - [ ] Return `IsFound=true` with data if record exists
 - [ ] Return `IsFound=false` with nulls if record does not exist

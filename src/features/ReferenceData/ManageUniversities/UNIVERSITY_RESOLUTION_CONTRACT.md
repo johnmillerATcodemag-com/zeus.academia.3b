@@ -33,9 +33,11 @@ This document establishes the CANONICAL mapping between the `UniversityRecord` c
 - Resolution is deterministic, validated, and centralized
 - Downstream slices (RegisterAcademic, RecordDegreeObtained) follow a consistent pattern
 
-**Status**: ✅ APPROVED for Phase 0 Step 6
+**Status**: ✅ IMPLEMENTED in EP-1-3
 **Ownership**: ManageUniversities (catalog), Shared Kernel (value object), downstream slices (consumers)
-**Effective Date**: Post-Phase-0-Step-6 (before EP-1-3 implementation)
+**Effective Date**: August 26, 2026
+
+**Implementation**: `GetUniversityByCodeQuery`, `GetUniversityByCodeResponse`, and `GetUniversityByCodeHandler` are implemented under `GetUniversityByCode/` in this feature.
 
 ---
 
@@ -302,7 +304,7 @@ if (!universityDto.IsFound)
     // Catalog entry does not exist
     return Error.Create(
         "UniversityNotFound",
-        $"University code '{universityDto.Code}' is not in the catalog");
+        "The university code is not in the catalog");
 }
 
 if (!universityDto.IsActive)
@@ -328,20 +330,20 @@ var qualification = AcademicQualification.Create(
 ### The GetUniversityByCodeQuery Contract
 
 ```csharp
-namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared.Queries;
+namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.GetUniversityByCode;
 
 /// <summary>
 /// Query to resolve a university catalog entry by code.
 /// Called by downstream slices to fetch catalog data before creating domain value objects.
 /// </summary>
-public record GetUniversityByCodeQuery(string Code) : IRequest<GetUniversityByCodeResponse>;
+public sealed record GetUniversityByCodeQuery(string Code) : IRequest<GetUniversityByCodeResponse>;
 
 /// <summary>
 /// Response from GetUniversityByCodeQuery.
 /// Always returns a response object (never throws exceptions).
 /// Allows callers to distinguish "not found" from "inactive".
 /// </summary>
-public record GetUniversityByCodeResponse(
+public sealed record GetUniversityByCodeResponse(
     /// <summary>True if the code exists in the catalog.</summary>
     bool IsFound,
 
@@ -356,24 +358,36 @@ public record GetUniversityByCodeResponse(
 );
 
 /// <summary>
-/// Handler implementation (deferred to EP-1-3).
+/// Handler implementation owned by ManageUniversities.
 /// Must query UniversityRecord by Code and return the response.
 /// </summary>
-public class GetUniversityByCodeQueryHandler : IRequestHandler<GetUniversityByCodeQuery, GetUniversityByCodeResponse>
+public sealed class GetUniversityByCodeHandler : IRequestHandler<GetUniversityByCodeQuery, GetUniversityByCodeResponse>
 {
-    private readonly ManageUniversitiesDbContext _context;
+    private readonly ManageUniversitiesDbContext _dbContext;
 
-    public GetUniversityByCodeQueryHandler(ManageUniversitiesDbContext context)
+    public GetUniversityByCodeHandler(ManageUniversitiesDbContext dbContext)
     {
-        _context = context;
+        _dbContext = dbContext;
     }
 
     public async Task<GetUniversityByCodeResponse> Handle(
         GetUniversityByCodeQuery request,
         CancellationToken cancellationToken)
     {
-        var record = await _context.Universities
-            .FirstOrDefaultAsync(u => u.Code == request.Code, cancellationToken);
+        string normalizedCode;
+
+        try
+        {
+            normalizedCode = University.Create(request.Code).Code;
+        }
+        catch (ArgumentException)
+        {
+            return new GetUniversityByCodeResponse(IsFound: false, Code: null, Name: null, IsActive: false);
+        }
+
+        var record = await _dbContext.Universities
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Code == normalizedCode, cancellationToken);
 
         if (record is null)
         {

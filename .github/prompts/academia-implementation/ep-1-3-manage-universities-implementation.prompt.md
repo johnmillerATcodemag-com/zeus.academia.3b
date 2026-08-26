@@ -51,6 +51,7 @@ mode: agent
 - Required prior slices: Shared Kernel
 - Blocking risks: university code format may already appear in existing fixtures; reconcile those values before locking the validator.
 - Existing patterns to reuse: reference-data CRUD-lite behavior, code uniqueness, and deterministic listing.
+- The downstream resolution contract is part of this slice: `GetUniversityByCodeQuery` returns canonical code, descriptive name, and active state without exposing the feature DbContext to consumers.
 - Placeholder entity types are prohibited. `UniversityRecord` must be a real persistence model, not a stub or placeholder class.
 - `UniversityRecord.Code` is the canonical primary key and must be configured explicitly as the key in the EF Core model before migration generation or startup verification.
 - The model must include a `UniversityRecordConfiguration` with `builder.HasKey(x => x.Code)` and the canonical maximum length and requiredness checks.
@@ -85,7 +86,11 @@ mode: agent
    Targets: ListUniversities query, handler, response contract, and endpoint.
    Owner: backend-domain.
    Validation before next step: query returns stable reference data for registration and qualification flows.
-5. Verify the slice.
+5. Implement university-code resolution.
+   Targets: `GetUniversityByCode/GetUniversityByCodeQuery.cs`, `GetUniversityByCodeResponse.cs`, and `GetUniversityByCodeHandler.cs`.
+   Owner: backend-domain.
+   Validation before next step: normalized found, unknown/malformed not-found, and inactive-state responses are explicit and covered by direct tests.
+6. Verify the slice.
    Targets: validator tests, handler tests, `tests/Features/ReferenceData/ManageUniversities/ManageUniversitiesSqlServerTestDatabase.cs`, `ManageUniversitiesSqlServerIntegrationTests.cs`, SQL Server migration checks, and integration tests.
    Owner: testing-verification.
    Validation before next step: add and list flows pass with clear failure coverage, the named SQL Server harness applies migrations to a unique database and cleans it up best-effort, `dotnet ef migrations list` discovers the feature migration, generated SQL contains the `Universities` table and `CK_Universities_Code_Allowed`, fresh-context read-back succeeds, and the executed integration test count is recorded.
@@ -112,6 +117,8 @@ mode: agent
 - Duplicate university codes are rejected without partial persistence.
 - University-code normalization, uniqueness, and error messaging derive from one canonical source rather than being redefined independently in validators, mappings, and persistence rules.
 - Listing universities returns stable data that downstream slices can resolve reliably.
+- `GetUniversityByCodeQuery` is implemented as the public downstream resolution contract; consumers do not access `ManageUniversitiesDbContext` or `UniversityRecord` directly.
+- Resolution normalizes through Shared Kernel `University.Create`, returns nullable fields on not-found, and preserves `IsActive` for inactive records.
 - Validation, handler logic, and persistence behavior agree on duplicate handling.
 - Automated tests cover add success, duplicate rejection, and list-query behavior.
 - The feature test project includes SQL Server integration coverage using `Microsoft.EntityFrameworkCore.SqlServer`; InMemory tests alone do not satisfy this criterion. The harness uses a unique database, applies migrations, verifies fresh-context persistence, and performs best-effort cleanup.

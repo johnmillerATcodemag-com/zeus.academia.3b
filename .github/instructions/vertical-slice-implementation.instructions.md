@@ -60,6 +60,8 @@ Before a slice is considered ready for review or merge, verify all of the follow
 - [ ] Feature registration helpers do not independently resolve runtime connection settings.
 - [ ] EF discovers the feature migration, generated SQL contains the expected schema objects, and a fresh SQL Server database accepts the migration.
 - [ ] Shared normalization or validation logic is centralized instead of duplicated across handlers, validators, and mappings.
+- [ ] Cross-feature reference data is consumed through a public query or service contract; consumers do not reference the owning feature's DbContext or persistence entity.
+- [ ] Found/not-found and active/inactive semantics are explicit and covered by contract tests.
 - [ ] Endpoint `Produces*` contracts match actual runtime responses, especially validation, conflict, and parse failures.
 
 Use the following terms consistently:

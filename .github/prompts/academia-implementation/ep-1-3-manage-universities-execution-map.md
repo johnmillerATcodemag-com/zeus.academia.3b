@@ -38,7 +38,7 @@ Relevant existing types and persistence:
 - `src/features/SharedKernel/Foundation/Persistence/SharedKernelDbContext.cs`
 - `src/features/ReferenceData/ManageDegrees/` as the nearest reference-data implementation pattern
 
-The feature project, DbContext, service-registration helper, resolution contract, and handoff notes already exist. The DbContext currently contains a placeholder `UniversityRecord`; no university handlers, endpoints, tests, or migrations exist yet.
+The feature project, DbContext, service-registration helper, resolution contract, handoff notes, add/list handlers, tests, and migrations exist. The implemented `UniversityRecord` is the catalog persistence model and `GetUniversityByCode` is the downstream resolution contract.
 
 No competing university catalog model or `Universities` migration owner was found outside this feature. The existing placeholder is the only in-tree `UniversityRecord` declaration and must be replaced within this slice.
 
@@ -65,7 +65,8 @@ Before implementation is considered ready:
 | List use case             | `ListUniversities/ListUniversitiesQuery.cs`, `ListUniversitiesHandler.cs`, `ListUniversitiesResponse.cs`, `ListUniversitiesEndpoint.cs`                                                      |
 | Slice support             | `Shared/UniversityRecord.cs`, canonical university-code catalog, conflict exception, `ManageUniversitiesDbContext.cs`, EF configuration                                                      |
 | Project                   | `Zeus.Academia.Features.ReferenceData.ManageUniversities.csproj`                                                                                                                             |
-| Tests                     | `tests/Features/ReferenceData/ManageUniversities/` with validator, add-handler, list-handler, model, and project files                                                                       |
+| Resolution use case       | `GetUniversityByCode/GetUniversityByCodeQuery.cs`, `GetUniversityByCodeResponse.cs`, `GetUniversityByCodeHandler.cs`                                                                         |
+| Tests                     | `tests/Features/ReferenceData/ManageUniversities/` with validator, add-handler, list-handler, resolution, model, SQL Server harness, and integration tests                                   |
 | Required schema artifacts | Migration class, Designer metadata, and model snapshot under `src/features/ReferenceData/ManageUniversities/Shared/Migrations/`; required because the host invokes `Database.MigrateAsync()` |
 
 ## Route Decision
@@ -80,6 +81,8 @@ The route group should follow the ManageDegrees feature pattern. The API host ex
 ## Host Composition Status
 
 The host project now references and registers the ManageUniversities project, its DbContext, and its MediatR assembly, and invokes `ManageUniversitiesDbContext.Database.MigrateAsync()`. The host does not yet map ManageUniversities endpoints because this slice has not produced an endpoint aggregator. Route mapping remains coordinator-owned and must be added only after the endpoint contract is implemented.
+
+The resolution query is an internal MediatR contract and does not require a separate public HTTP endpoint. Downstream slices must consume it through `ISender` or `IMediator`.
 
 ## Schema Decision
 
@@ -105,6 +108,8 @@ The approved resolution contract is now implemented: `University.Code` is the im
 - Canonical length checks must run against the trimmed/normalized code path, not the raw input string.
 - Duplicate codes fail without partial persistence.
 - List returns stable deterministic ordering.
+- `GetUniversityByCodeQuery` resolves normalized codes and returns explicit found, name, and active-state data.
+- Unknown or malformed codes return `IsFound=false` with nullable `Code` and `Name`; inactive records return `IsFound=true` and `IsActive=false`.
 - The slice remains reference-data only; it does not assign universities to qualifications.
 - Feature package versions must stay aligned with sibling reference-data feature projects unless a deliberate version pin is documented.
 
@@ -113,10 +118,12 @@ The approved resolution contract is now implemented: `University.Code` is the im
 - Validator tests: required, whitespace, length, normalization, and invalid-code behavior.
 - Add-handler tests: success, duplicate rejection, and no duplicate persistence.
 - List-handler tests: deterministic ordering and response shape.
+- Resolution-handler tests: normalized found, unknown/malformed not-found, and inactive-state responses.
 - Model tests: primary key, field length, requiredness, and absence of duplicate PK unique index.
 - SQL Server verification: generated schema or migration output must be checked against the target provider.
 - Integration tests that provision a database must use an isolated test database and best-effort cleanup in `finally` blocks.
 - EF verification must run `dotnet ef migrations list` and fail if no migration is discovered. Generated SQL must include the `Universities` table, `PK_Universities`, and `CK_Universities_Code_Allowed`; a fresh SQL Server migration application must succeed before handoff.
+- SQL Server integration must verify resolution through a fresh DbContext after persistence, including normalized lookup and inactive-state preservation.
 
 ## Allowed File Set
 

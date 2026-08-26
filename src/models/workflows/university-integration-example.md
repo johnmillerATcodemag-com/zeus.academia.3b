@@ -65,7 +65,7 @@ namespace Zeus.Academia.Features.RegisterAcademic.Handlers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Zeus.Academia.Features.ReferenceData.ManageDegrees.Shared.Queries;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared.Queries;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities.GetUniversityByCode;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 public class RecordQualificationCommandHandler : IRequestHandler<RecordQualificationCommand, Result>
@@ -431,6 +431,7 @@ When implementing RecordQualificationCommand and its handler:
 - [ ] Return error immediately if either check fails (do NOT try to create value object)
 - [ ] Only create `University.Create(universityDto.Code)` after both checks pass
 - [ ] Store `university.Code` in the aggregate, not `universityDto.Name`
+- [ ] Do not inject `ManageUniversitiesDbContext` or reference `UniversityRecord` directly
 - [ ] Handle `DbUpdateException` for duplicate qualifications
 - [ ] Never throw exceptions for validation failures; return `Result.Failure(...)`
 
@@ -463,6 +464,8 @@ When implementing RecordQualificationCommand and its handler:
 - Input: "boston_u" (lowercase)
 - Mock returns normalized: "BOSTON_U"
 - Assert stored as uppercase
+
+**Contract shape**: unknown or malformed codes return `IsFound=false` with `Code=null` and `Name=null`; inactive records return `IsFound=true` with `IsActive=false`.
 
 ### Integration Tests (RegisterAcademic + ManageUniversities)
 

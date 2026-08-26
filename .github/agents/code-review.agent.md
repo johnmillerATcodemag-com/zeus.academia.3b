@@ -60,6 +60,7 @@ Required review checks:
 - Verify endpoint `Produces*` declarations match actual runtime responses and no validation or conflict failure leaks as a 500.
 - Flag unreachable catch blocks, dead validation branches, or impossible exception handlers that hide the real failure contract.
 - Flag any review gap that would cause a route to be silent, unreachable, or drifted from shared invariants.
+- Treat direct access to another feature's DbContext or persistence entity as a blocking cross-feature contract violation when a public query or service contract exists. Verify lookup consumers distinguish not-found from inactive records and persist canonical codes rather than display names.
 
 ## Skills
 

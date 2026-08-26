@@ -62,6 +62,7 @@ Every implementation prompt must explicitly require the implementation team to d
 - check neighboring slices and shared helper files for single-source-of-truth logic before new rules are introduced
 - verify that a feature-local DbContext or migration path is explicitly owned and invoked from the host when startup applies migrations
 - include a verification step for `Produces*` response contracts when the route advertises validation or conflict responses
+- when a feature owns reference data needed by downstream slices, name its public query/response contract and prohibit direct consumer access to that feature's DbContext or persistence entity
 
 If the slice adds a Minimal API or route aggregation file, the acceptance criteria must include the startup mapping call and a verification step proving the path is reachable.
 
@@ -173,6 +174,7 @@ Required coverage:
 - No lossy value coercion in domain parse/create APIs unless explicitly required and tested
 - Persistence-backed domain field parity (domain create/update paths enforce persistence max-length, precision, scale, and normalization constraints before persistence)
 - Persisted identifier guards at public APIs (factories/mutators that accept persisted identifiers such as `empNr` enforce shared max-length constraints and normalization before state mutation)
+- Cross-feature reference-data contracts are explicit: found/not-found and active/inactive semantics are defined, and consumers use the public query or service contract rather than the owning feature's persistence types.
 - Normalization ownership boundaries (unrelated domain concepts must not depend on each other's normalization helpers; use local normalization or a neutral shared helper)
 - Canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
 - Canonical-owner enforcement for numeric/date/enum rules (prompts must name the owning factory/value object, prohibit duplicate command-local algorithms, and require direct tests for the owner plus request-property error adaptation)
