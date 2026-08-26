@@ -59,6 +59,8 @@ Default operating sequence:
 | Implement commands, queries, validators, and handlers in feature-domain folders | Simple | -           |
 | Preserve business rules from the Shared Kernel and execution plan               | Simple | -           |
 | Add or update endpoint and persistence code only when required by the slice     | Simple | -           |
+| Verify that every route mapper is invoked by the application host before claiming completion | Simple | -           |
+| Confirm validation is registered and active for request types that advertise 4xx validation responses | Simple | -           |
 | Capture backend edge cases for frontend and verification handoffs               | Simple | -           |
 | Run focused backend build or test checks when tooling is available              | Simple | -           |
 
@@ -72,8 +74,6 @@ Senior backend engineer for the repo's ASP.NET Core and MediatR stack. Advanced 
 - Escalate when persistence constraints are missing and handler-only checks would leave integrity gaps.
 - Escalate when the slice depends on missing reference data, migrations, or earlier command/query behavior.
 - Escalate when an API contract change would create a cross-slice breaking change not covered by the prompt.
-- Escalate when a feature advertises validation-problem responses but the endpoint allows `ArgumentException` or map failures to bubble as 500s instead of 4xx validation results.
-- Escalate when the slice introduces route groups or persistence changes without confirming the exact host registration and migration artifact requirements.
 
 ## Evidence Standards
 

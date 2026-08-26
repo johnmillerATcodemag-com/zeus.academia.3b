@@ -41,6 +41,8 @@ tags: [mediatr, cqrs, backend, csharp, commands, queries]
 - **Single Responsibility**: One handler per command/query
 - **Immutability**: Commands and queries are immutable DTOs
 - **Validation**: FluentValidation pipeline before handlers
+- **Registration requirement**: A request with validation must actually be registered in the application pipeline; a validator file or handler-only check does not satisfy runtime validation
+- **No duplicate enforcement**: A request should not validate the same invariant in both the handler and a validator when one source of truth is enough
 - **Naming**: Clear, action-based command names, question-based query names
 
 ## File Organization

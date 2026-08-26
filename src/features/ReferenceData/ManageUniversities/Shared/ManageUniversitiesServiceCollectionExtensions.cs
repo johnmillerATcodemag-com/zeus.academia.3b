@@ -1,40 +1,33 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MediatR;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
-/// <summary>
-/// Service collection extensions for ManageUniversities feature.
-/// Registers persistence (DbContext) and MediatR handlers.
-/// </summary>
 public static class ManageUniversitiesServiceCollectionExtensions
 {
-  /// <summary>
-  /// Adds ManageUniversitiesDbContext and configures SQL Server connection.
-  /// Called from Program.cs during service registration (Phase 1).
-  /// </summary>
   public static IServiceCollection AddManageUniversitiesPersistence(
-      this IServiceCollection services,
-      IConfiguration configuration)
+    this IServiceCollection services,
+    IConfiguration configuration)
   {
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    var connectionString = configuration.GetConnectionString("DefaultConnection")
+                           ?? Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION")
+                           ?? throw new InvalidOperationException(
+                             "No connection string found for Manage Universities persistence. " +
+                             "Configure ConnectionStrings:DefaultConnection in appsettings.json or set ZEUS_SQLSERVER_CONNECTION environment variable.");
 
     services.AddDbContext<ManageUniversitiesDbContext>(options =>
-        options.UseSqlServer(connectionString));
+      options.UseSqlServer(connectionString));
 
     return services;
   }
 
-  /// <summary>
-  /// Registers MediatR handlers from the ManageUniversities assembly.
-  /// Discovers and registers all commands, queries, and handlers.
-  /// </summary>
   public static IServiceCollection AddManageUniversitiesMediatR(
-      this IServiceCollection services)
+    this IServiceCollection services)
   {
     services.AddMediatR(cfg =>
-        cfg.RegisterServicesFromAssembly(typeof(ManageUniversitiesDbContext).Assembly));
+      cfg.RegisterServicesFromAssembly(typeof(ManageUniversitiesDbContext).Assembly));
 
     return services;
   }

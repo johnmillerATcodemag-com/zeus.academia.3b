@@ -48,8 +48,7 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 
 **Rules:**
 
-- MUST have one primary type per file (class/interface/record)
-- MUST split multi-type helper files into separate files; do not place multiple primary domain types in one file without explicit approval
+- MUST have one type per file (class/interface/record)
 - MUST name file to match type name (`Order.cs`, `IOrderRepository.cs`)
 - MUST use file-scoped namespaces (C# 10+)
 - MUST organize members: fields → constructors → properties → methods
@@ -96,8 +95,6 @@ public sealed class Order
 - MUST use null-conditional (`?.`) and null-coalescing (`??`) operators
 - MUST validate parameters with `ArgumentNullException.ThrowIfNull(param)` (C# 12+)
 - MUST model failing `Try*` lookup outputs with nullable out values (for example `T?`) rather than `null!`, and callers must null-check before dereferencing
-- MUST treat `out T? value` with `value = null` as the canonical failing-pattern for `Try*` helpers; never assign `null!` to a nullable out parameter or suppress nullability to satisfy a helper contract
-- MUST ensure normalization and length checks use the same canonical path as the creating factory, especially for identity values like university codes, not a parallel raw-input `Trim().Length` implementation
 
 **Examples:**
 
@@ -119,6 +116,36 @@ public void ProcessOrder(Order order)
 public Order FindOrder(Guid id)
 {
     return _repository.GetById(id)!; // Null-forgiving without validation
+}
+```
+
+## Try* and Parsing Contract Guardrails
+
+- Use the standard `Try*` pattern: `bool TryX(..., out T? value)` and set `value = null` when the conversion fails.
+- Do not return a non-null placeholder value when the success flag is `false`.
+- A caller must check the success result before dereferencing or consuming the output value.
+- Validation and parsing logic must use a single source of truth instead of silently duplicating allowed-value or normalization rules across layers.
+
+```csharp
+// ✅ Correct
+public static bool TryParseUniversity(string value, out UniversityCode? result)
+{
+    if (string.IsNullOrWhiteSpace(value))
+    {
+        result = null;
+        return false;
+    }
+
+    var normalized = value.Trim();
+    result = normalized.Length > 0 ? new UniversityCode(normalized) : null;
+    return result is not null;
+}
+
+// ❌ Avoid
+public static bool TryParseUniversity(string value, out UniversityCode result)
+{
+    result = new UniversityCode("UNKNOWN");
+    return false;
 }
 ```
 

@@ -59,6 +59,8 @@ Every implementation prompt must explicitly require the implementation team to d
 - verify runtime reachability rather than assuming a compile-only success
 - reuse any existing numeric normalization, validation, or conflict rules instead of duplicating them across validators and handlers
 - check neighboring slices and shared helper files for single-source-of-truth logic before new rules are introduced
+- verify that a feature-local DbContext or migration path is explicitly owned and invoked from the host when startup applies migrations
+- include a verification step for `Produces*` response contracts when the route advertises validation or conflict responses
 
 If the slice adds a Minimal API or route aggregation file, the acceptance criteria must include the startup mapping call and a verification step proving the path is reachable.
 

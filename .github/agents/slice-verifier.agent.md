@@ -46,8 +46,6 @@ Hard boundaries:
 - Treat host route mapping and migration artifacts as acceptance criteria when the slice introduces a new endpoint group or feature DbContext.
 - Treat validation-problem behavior as a required 4xx contract for endpoints that advertise it; a bubbling `ArgumentException` is a failure.
 - Flag nullable-safety violations in lookup helpers that use `null!` instead of a nullable failure path.
-- Fail verification if a feature introduces multiple primary types in one file, duplicates canonical normalization logic, or ignores the repository's single-source-of-truth pattern for identity values.
-- Fail verification if a slice adds a DbContext or schema change without migration artifacts or a documented mapping-only exception.
 
 Required output structure when invoked:
 
