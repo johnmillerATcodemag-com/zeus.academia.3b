@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
 

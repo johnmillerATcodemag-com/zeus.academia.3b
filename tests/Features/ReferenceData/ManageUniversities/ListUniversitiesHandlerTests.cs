@@ -1,20 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities.ListUniversities;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 
 namespace Zeus.Academia.Tests.Features.ReferenceData.ManageUniversities;
 
 public sealed class ListUniversitiesHandlerTests
 {
   [Fact]
-  public async Task Handle_ReturnsStableSortedUniversities()
+  public async Task Handle_ReturnsStableSortedCodesWithResponseShape()
   {
     await using var dbContext = CreateInMemoryContext();
     dbContext.Universities.AddRange(
-      UniversityRecord.Create("STANFORD", "Stanford University"),
-      UniversityRecord.Create("MIT", "Massachusetts Institute of Technology"),
-      UniversityRecord.Create("BOSTON_U", "Boston University"));
+      UniversityRecord.Create("mit", "Massachusetts Institute of Technology"),
+      UniversityRecord.Create("stanford", "Stanford University"),
+      UniversityRecord.Create("boston_u", "Boston University"));
     await dbContext.SaveChangesAsync();
 
     var handler = new ListUniversitiesHandler(dbContext);
@@ -24,6 +23,9 @@ public sealed class ListUniversitiesHandlerTests
     Assert.Equal(3, response.Count);
     Assert.Equal(["BOSTON_U", "MIT", "STANFORD"], response.Select(x => x.Code).ToArray());
     Assert.Equal("Boston University", response[0].Name);
+    Assert.Equal("Massachusetts Institute of Technology", response[1].Name);
+    Assert.Equal("Stanford University", response[2].Name);
+    Assert.All(response, x => Assert.True(x.IsActive));
   }
 
   private static ManageUniversitiesDbContext CreateInMemoryContext()

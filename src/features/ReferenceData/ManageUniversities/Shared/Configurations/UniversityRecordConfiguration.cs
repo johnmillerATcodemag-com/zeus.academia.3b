@@ -8,7 +8,7 @@ public sealed class UniversityRecordConfiguration : IEntityTypeConfiguration<Uni
 {
   public void Configure(EntityTypeBuilder<UniversityRecord> builder)
   {
-    var allowedSqlValues = string.Join(", ", UniversityCodeCatalog.SupportedUniversities.Select(x => $"'{x.Code}'"));
+    var allowedSqlValues = string.Join(", ", UniversityCodeCatalog.SupportedCodes.Select(code => $"'{code}'"));
 
     builder.ToTable("Universities", tableBuilder =>
       tableBuilder.HasCheckConstraint("CK_Universities_Code_Allowed", $"[Code] IN ({allowedSqlValues})"));
@@ -24,9 +24,7 @@ public sealed class UniversityRecordConfiguration : IEntityTypeConfiguration<Uni
       .IsRequired();
 
     builder.Property(x => x.IsActive)
+      .HasDefaultValue(true)
       .IsRequired();
-
-    builder.HasIndex(x => x.IsActive)
-      .HasDatabaseName("IX_Universities_IsActive");
   }
 }

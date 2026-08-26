@@ -1,5 +1,5 @@
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 namespace Zeus.Academia.Tests.Features.ReferenceData.ManageUniversities;
@@ -25,7 +25,7 @@ public sealed class AddUniversityCommandValidatorTests
   }
 
   [Fact]
-  public void Validate_WhenCodeExceedsMaxLength_ReturnsLengthMessage()
+  public void Validate_WhenCodeExceedsMaxLength_ReturnsMaxLengthMessage()
   {
     var command = new AddUniversityCommand(new string('A', SharedKernelFieldLengths.UniversityCode + 1));
 
@@ -38,8 +38,8 @@ public sealed class AddUniversityCommandValidatorTests
   }
 
   [Theory]
-  [InlineData("x")]
-  [InlineData("unknown")]
+  [InlineData("harvard")]
+  [InlineData("princeton")]
   public void Validate_WhenCodeInvalid_ReturnsAllowedValuesMessage(string code)
   {
     var command = new AddUniversityCommand(code);
@@ -55,7 +55,7 @@ public sealed class AddUniversityCommandValidatorTests
 
   [Theory]
   [InlineData("MIT")]
-  [InlineData("harvard")]
+  [InlineData("stanford")]
   [InlineData(" boston_u ")]
   public void Validate_WhenCodeAllowed_IsValid(string code)
   {

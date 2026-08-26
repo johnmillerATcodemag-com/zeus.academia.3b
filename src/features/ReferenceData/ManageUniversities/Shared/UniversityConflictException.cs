@@ -1,4 +1,4 @@
-namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
+namespace Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
 public sealed class UniversityConflictException : Exception
 {
