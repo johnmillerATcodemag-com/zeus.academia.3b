@@ -16,8 +16,8 @@ public sealed class ProvisionExtensionHandler : IRequestHandler<ProvisionExtensi
 
   public async Task<ProvisionExtensionResponse> Handle(ProvisionExtensionCommand request, CancellationToken cancellationToken)
   {
-    var normalizedNumber = ProvisionExtensionCommand.NormalizeNumber(request.ExtNr);
-    var extension = Extension.Create(normalizedNumber);
+    var extension = Extension.Create(request.ExtNr);
+    var normalizedNumber = extension.Number;
 
     var duplicateExists = await _dbContext.Extensions
       .AsNoTracking()

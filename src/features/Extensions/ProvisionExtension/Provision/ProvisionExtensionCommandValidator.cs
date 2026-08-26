@@ -1,4 +1,5 @@
 using FluentValidation;
+using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 namespace Zeus.Academia.Features.Extensions.ProvisionExtension.Provision;
 
@@ -12,7 +13,7 @@ public sealed class ProvisionExtensionCommandValidator : AbstractValidator<Provi
       {
         try
         {
-          ProvisionExtensionCommand.NormalizeNumber(extNr);
+          Extension.Create(extNr);
         }
         catch (ArgumentOutOfRangeException ex)
         {
