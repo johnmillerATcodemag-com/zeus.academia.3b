@@ -39,18 +39,18 @@ Hard boundaries:
 
 - Do not approve a change without evidence of runtime registration or a startup verification step.
 - Do not ignore duplicated validation logic across a handler and validator when the rule addresses the same field or invariant.
-- Do not approve a feature when host and feature-level configuration use different sources of truth for the same runtime dependency (for example `ZEUS_SQLSERVER_CONNECTION` vs `ConnectionStrings:DefaultConnection`).
 - Do not expand the review scope beyond the changed slice and immediately adjacent registration points.
-- Do not call something complete if the app host has not registered the feature's route aggregator or the feature's migration ownership is not explicitly documented.
+- Do not call something complete if the app host has not registered the feature's route aggregator.
 
 Required review checks:
 
 - Verify every `Map...Endpoints()` call is invoked from the application composition root.
 - Verify a new route or endpoint is reachable at runtime and not just present in a feature file.
-- Verify a host or service registration does not split the same runtime dependency across incompatible configuration sources (for example `ZEUS_SQLSERVER_CONNECTION` and `ConnectionStrings:DefaultConnection`).
-- Verify the migration owner or startup migration path is explicit whenever a feature-local DbContext participates in `Database.MigrateAsync()`.
+- Verify that endpoints that advertise validation problems actually translate the expected normalization/argument failures into `Results.ValidationProblem(...)` or equivalent; a 500 from an unhandled `ArgumentException` or `ArgumentOutOfRangeException` is a blocker.
 - Verify if a number, date, enum, or domain rule is normalized in more than one layer, it is centralized.
-- Verify no business rule is duplicated between a command validator and its handler.
+- Verify no business rule is duplicated between a command validator and its handler or mapping helper.
+- Verify there are direct tests for validator and invalid-input behavior when a new validator or validation contract is introduced.
+- Flag unreachable catch blocks, dead validation branches, or impossible exception handlers that hide the real failure contract.
 - Flag any review gap that would cause a route to be silent, unreachable, or drifted from shared invariants.
 
 ## Skills

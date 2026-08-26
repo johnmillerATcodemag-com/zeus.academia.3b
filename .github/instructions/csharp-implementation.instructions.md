@@ -56,6 +56,8 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 - MUST match namespace to folder structure
 - MUST keep collection encapsulation boundaries intact by returning read-only wrappers for mutable backing collections (for example `AsReadOnly()` for `List<T>` fields exposed as read-only members)
 - MUST keep canonical normalization and validation logic in one authoritative source of truth; do not duplicate raw-input normalization in helper catalogs or lookup adapters when the domain factory already defines the canonical value
+- MUST centralize numeric/date/enum coercion and range rules in one shared helper or value object, and require handlers, validators, and mapping helpers to reuse that canonical logic instead of re-implementing equivalent checks
+- MUST NOT keep unreachable `catch` blocks for impossible exceptions; if range checks or earlier guards make a failure impossible, remove the dead catch and rely on the real validation path
 
 **Template:**
 
@@ -189,9 +191,11 @@ public Order GetOrder(Guid orderId)
 - MUST validate at API boundaries (controllers, handlers)
 - MUST log exceptions before rethrowing or wrapping
 - MUST NOT include secrets (connection strings, credentials, tokens, keys) in exception or log messages; redact or omit sensitive values
+- MUST catch and translate validation/normalization failures at the API boundary when the route contract promises `ValidationProblem`; do not let `ArgumentException`, `ArgumentOutOfRangeException`, or equivalent value-normalization failures escape as 500s
 - SHOULD keep validation/parse failures actionable by listing allowed values when inputs are constrained (using existing constants, not duplicated literals)
 - MUST derive allowed-value messages from existing constants or shared helpers rather than re-declaring the same literal set in multiple messages
 - SHOULD build exception messages from a single source of truth (for example, a `AllowedValues` array or helper) so messages stay consistent when the accepted set changes
+- MUST NOT leave unreachable exception handlers that imply impossible failure paths; dead catches hide the actual normalization/validation contract and make the failure model harder to reason about
 - SHOULD create domain-specific exceptions for business rule violations
 
 **Template:**

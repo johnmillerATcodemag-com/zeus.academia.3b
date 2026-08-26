@@ -68,6 +68,14 @@ builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 - SQL Server tests that use per-test database names MUST run best-effort `EnsureDeletedAsync()` teardown even when assertions fail.
 - Cleanup failures SHOULD surface as warnings when possible, but must not hide the original assertion failure.
 
+## Validator and Endpoint Contract Coverage
+
+- Every new validator MUST include dedicated tests for required values, invalid ranges, invalid formats, and a success case.
+- When a route advertises validation failures (for example `.ProducesValidationProblem()` or equivalent), tests MUST verify the endpoint returns a validation result for invalid numbers, ranges, and malformed input instead of leaking an unhandled exception.
+- Validation tests MUST assert on stable failure messages or keys so the contract does not drift when rules are refactored.
+- A validator without direct coverage is a review-blocking gap, even if the command handler and mapper compile successfully.
+- A mapping or handler that duplicates normalization logic already centralized in a shared helper must be flagged by tests and review before merge.
+
 ## File Organization
 
 - `tests/Zeus.Academia.UnitTests/` - Unit tests

@@ -188,6 +188,16 @@ Preferred format:
 
 Acceptance criteria MUST be usable by both agents and humans. Each criterion MUST be:
 
+The prompt MUST explicitly require proof that the slice is complete in the application composition root, not just that related feature files exist. For endpoint-bearing slices, require these checks in the acceptance criteria:
+
+- `Program.cs` or the application host has a direct call to the feature route aggregator, such as `app.Map...Endpoints()`.
+- The route is reachable at runtime and the verification command or smoke test is recorded before the slice is marked done.
+- Any endpoint claiming a validation problem contract includes the actual exception-to-response mapping for `ArgumentException`, `ArgumentOutOfRangeException`, and equivalent normalization failures.
+- Validation and normalization logic is centralized in one shared helper or domain primitive; no equivalent number/date/range rule is duplicated across validator, handler, and mapper.
+- New validators include direct tests for required, range, whole-number, and success cases, and invalid input tests verify the endpoint contract is preserved.
+- Unreachable exception handlers or dead catch blocks are not accepted when the real validation path already exists.
+
+
 - observable
 - testable
 - scoped to the slice outcome, not the implementation task list
