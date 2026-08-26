@@ -165,6 +165,7 @@ Required coverage:
 - User-visible outcome or business rule satisfied
 - Dependency compatibility checks for coupled tooling packages (for example xUnit core/runner major-version alignment)
 - Test resource lifecycle rules for integration tests that provision external resources (must include teardown strategy)
+- Provider-backed integration coverage for every persistence-bearing slice, including the named test project, harness strategy, migration application, fresh-context read-back, and observed test count
 - C# file/type organization hygiene (one primary type per file and file names aligned to their primary type)
 - Exception argument-name accuracy for guard clauses and mapping failures (for example, property-specific failures use the property name rather than the enclosing command object)
 - Ownership-safe aggregate mutation rules for linked entities (for example, release operations must verify current ownership and assignment operations must not overwrite a different existing link)
@@ -191,6 +192,7 @@ Required coverage:
 - Scaffold cleanup and naming hygiene when new files are introduced: no leftover `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter artifacts; file names must match the primary type or test behavior.
 - Script and setup-helper hygiene when verification touches infrastructure configuration: environment variables are read once per value and reused through a local variable or helper instead of duplicated lookups.
 - Teardown failure isolation for integration tests: cleanup runs as best-effort in `finally` and teardown exceptions must not replace the primary assertion failure signal.
+- InMemory tests may supplement persistence tests but cannot replace SQL Server integration evidence when a feature owns a DbContext or migration set.
 - Cross-platform SQL Server setup behavior for scripts/factories: SQL Server LocalDB fallback is allowed only behind explicit Windows checks; on non-Windows hosts require `ZEUS_SQLSERVER_CONNECTION` and fail with actionable diagnostics.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.

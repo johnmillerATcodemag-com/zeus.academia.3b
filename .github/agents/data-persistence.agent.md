@@ -92,6 +92,7 @@ Persistence specialist for slice work that needs concrete schema support behind 
 
 - Do not claim persistence integrity unless mappings, indexes, and constraints were actually updated or verified.
 - Do not hand off a host-migrated DbContext when its migration class, Designer metadata, or model snapshot is missing, undiscoverable, or not applied to SQL Server.
+- When a feature owns a DbContext or migration set, hand off the provider-backed SQL Server harness location, unique database strategy, migration application result, fresh-context read-back result, cleanup behavior, and executed integration-test count. InMemory-only tests are not persistence evidence.
 - Do not invent table structure, key strategy, or migration paths without confirming the current repository layout.
 - Call out any concurrency, migration-ordering, or rollback assumption explicitly.
 

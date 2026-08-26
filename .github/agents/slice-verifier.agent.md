@@ -104,6 +104,7 @@ Senior QA and release-verification engineer with strong experience validating ba
 - Use SQL Server-backed verification only; do not substitute SQLite or other in-memory providers.
 - Do not mark persistence constraints as verified unless SQL Server checks were executed or explicitly blocked.
 - For each host-migrated feature, report migration status as `discovered`, `not discovered`, or `blocked`; report generated SQL as `passed` or `failed`; and report fresh-database application as `passed`, `failed`, or `blocked`. Do not grant readiness when any required status is `not discovered` or `failed`.
+- For each persistence-bearing feature, report provider-backed suite status as `present`, `missing`, or `blocked`, including harness, unique database, migration, fresh-context read-back, cleanup, and executed test count. Do not grant readiness when the feature has only InMemory tests.
 
 ## Behavior Tests
 

@@ -86,6 +86,7 @@ applyTo: "**"
   - Value-object parse/creation APIs reject lossy coercion (for example silently truncating fractional inputs) unless the behavior is explicitly required and tested.
   - Domain creation/update paths enforce persistence-backed field limits (for example max length, precision, scale) at creation-time so invalid objects are rejected before persistence.
   - Integration tests that provision external resources (databases, containers, queues, files) perform best-effort cleanup in `finally` blocks.
+  - Any persistence-bearing feature change must include provider-backed SQL Server integration tests in the feature test project; unit or EF Core InMemory tests alone do not satisfy the persistence gate. The handoff must report the executed integration test count and any blocked infrastructure checks.
   - Public/shared parse or mapping APIs retain direct acceptance tests when touched; do not remove only-path coverage without replacement.
   - Constrained-code parse/validation failures remain actionable by including allowed values (prefer constants over inline literals).
   - Validation messages must derive allowed values from a single source of truth rather than duplicating hard-coded literals across exception messages.

@@ -236,6 +236,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 - [ ] Slice changes comply with [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) and keep use-case artifacts co-located under the feature-domain tree
 - [ ] Tests added/updated for all functional changes
 - [ ] Integration tests that create external resources include deterministic best-effort cleanup (`finally` teardown)
+- [ ] Each changed persistence-bearing feature includes provider-backed SQL Server integration evidence, with isolated database names, migration application, cleanup, and the executed test count recorded
 - [ ] No secrets, credentials, or PII in diff
 - [ ] Linting passes (`eslint`, `pylint`, `clippy`, etc.)
 - [ ] Type checking passes (TypeScript, mypy, etc.)

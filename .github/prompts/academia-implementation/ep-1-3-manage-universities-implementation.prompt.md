@@ -86,9 +86,9 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: query returns stable reference data for registration and qualification flows.
 5. Verify the slice.
-   Targets: validator tests, handler tests, SQL Server migration checks, and integration tests.
+   Targets: validator tests, handler tests, `tests/Features/ReferenceData/ManageUniversities/ManageUniversitiesSqlServerTestDatabase.cs`, `ManageUniversitiesSqlServerIntegrationTests.cs`, SQL Server migration checks, and integration tests.
    Owner: testing-verification.
-   Validation before next step: add and list flows pass with clear failure coverage, `dotnet ef migrations list` discovers the feature migration, generated SQL contains the `Universities` table and `CK_Universities_Code_Allowed`, and a fresh SQL Server database accepts the migration.
+   Validation before next step: add and list flows pass with clear failure coverage, the named SQL Server harness applies migrations to a unique database and cleans it up best-effort, `dotnet ef migrations list` discovers the feature migration, generated SQL contains the `Universities` table and `CK_Universities_Code_Allowed`, fresh-context read-back succeeds, and the executed integration test count is recorded.
 
 ## Verification and Acceptance Criteria
 
@@ -114,6 +114,7 @@ mode: agent
 - Listing universities returns stable data that downstream slices can resolve reliably.
 - Validation, handler logic, and persistence behavior agree on duplicate handling.
 - Automated tests cover add success, duplicate rejection, and list-query behavior.
+- The feature test project includes SQL Server integration coverage using `Microsoft.EntityFrameworkCore.SqlServer`; InMemory tests alone do not satisfy this criterion. The harness uses a unique database, applies migrations, verifies fresh-context persistence, and performs best-effort cleanup.
 - Feature package versions should stay aligned with sibling reference-data feature projects unless a deliberate version pin is documented.
 
 ## Human Showcase Steps

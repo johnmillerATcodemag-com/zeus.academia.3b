@@ -76,9 +76,9 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: assigned extensions cannot be deprovisioned and unassigned ones can.
 4. Verify command behavior end to end.
-   Targets: validator tests, handler tests, feature-local model tests, SQL Server migration checks, and integration tests for provision, duplicate rejection, and deprovision guards.
+   Targets: validator tests, handler tests, `tests/Features/Extensions/ProvisionExtension/ProvisionExtensionSqlServerTestDatabase.cs`, `ProvisionExtensionSqlServerIntegrationTests.cs`, feature-local model tests, SQL Server migration checks, and integration tests for provision, duplicate rejection, and deprovision guards.
    Owner: testing-verification.
-   Validation before next step: `dotnet ef migrations list` discovers the feature migration, generated SQL matches the `Extensions` model, a fresh SQL Server database accepts the migration, and extension-pool behavior is reliable enough for registration to depend on it.
+   Validation before next step: the named SQL Server harness applies migrations to a unique database and cleans it up best-effort, `dotnet ef migrations list` discovers the feature migration, generated SQL matches the `Extensions` model, fresh-context read-back succeeds, the executed integration test count is recorded, and extension-pool behavior is reliable enough for registration to depend on it.
 
 ## Verification and Acceptance Criteria
 
@@ -96,6 +96,7 @@ mode: agent
 - Deprovisioning an unassigned extension succeeds and removes it from the available pool.
 - Deprovisioning an assigned extension fails and preserves the existing assignment state.
 - Automated tests cover valid provision, duplicate provision, valid deprovision, and assigned-extension rejection.
+- The feature test project includes SQL Server integration coverage using `Microsoft.EntityFrameworkCore.SqlServer`; InMemory tests alone do not satisfy this criterion. The harness verifies migration-backed provisioning and deprovisioning behavior with best-effort cleanup.
 
 ## Human Showcase Steps
 

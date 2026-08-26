@@ -301,6 +301,7 @@ Describe how slices self-register:
 - Test file path mirrors source: `tests/features/{{feature_name}}/Create{{feature_name}}/`.
 - Use a SQL Server-backed test environment (for example SQL Server LocalDB or a SQL Server test container) — never mock `DbContext` and never substitute SQLite in-memory providers for this repository.
 - Validate the full slice (command → handler → db round-trip) in integration tests; unit-test validators separately.
+- For every persistence-bearing slice, require a provider-backed SQL Server integration harness in the feature test project. The harness must isolate a unique database, apply migrations, assert through a fresh DbContext, and clean up best-effort; InMemory tests alone are insufficient.
 - Add UI tests under `src/features/{{feature_name}}/Create{{feature_name}}/__tests__/` and sibling use-case folders.
 - Test component rendering, store actions, and API error handling with Vitest.
 - Validate contract alignment between UI request/response types and endpoint DTOs.
@@ -333,6 +334,7 @@ Include a per-slice checklist at the end of the instruction file:
 - [ ] Response DTO is slice-private
 - [ ] Endpoint lives in the same use-case folder and maps to a distinct HTTP verb + route
 - [ ] Integration test covers success and at least one failure path
+- [ ] Persistence-bearing slices include SQL Server provider, migration-backed harness, fresh-context read-back, isolated database cleanup, and recorded integration-test evidence
 - [ ] No direct dependency on another feature domain's namespace
 - [ ] Use-case folder includes component, API client, store/composable, route module, and typed contracts
 - [ ] UI tests cover success and error flow

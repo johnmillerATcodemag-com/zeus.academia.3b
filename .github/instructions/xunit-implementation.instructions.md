@@ -49,6 +49,7 @@ tags: [xunit, testing, csharp, backend, unit-tests, integration-tests]
 - Model verification tests SHOULD inspect the EF Core `IModel` via `DbContext.Model` directly rather than using `context.GetService<IDesignTimeModel>()` in ordinary unit tests.
 - When a test asserts on keys, indexes, or check constraints, it should target the model metadata that the context actually exposes rather than a design-time service dependency.
 - Schema or migration assertions MUST verify the intended model shape and emitted migration output, not only an in-memory database configuration. When the host applies migrations for the context, verification MUST also prove that EF discovers the migration and can apply it to SQL Server.
+- Every persistence-bearing feature must include a provider-backed SQL Server integration suite in its feature test project. The suite must use `Microsoft.EntityFrameworkCore.SqlServer`, `SqlConnectionStringBuilder`, a unique test database name, `Database.MigrateAsync()`, and fresh DbContext instances for persistence read-back. A feature test project containing only InMemory tests is incomplete.
 
 ## Database Test Safety
 
@@ -68,6 +69,7 @@ builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 - SQL Server tests that use per-test database names MUST run best-effort `EnsureDeletedAsync()` teardown even when assertions fail.
 - Cleanup failures SHOULD surface as warnings when possible, but must not hide the original assertion failure.
 - EF Core InMemory tests may support fast handler tests, but they are not persistence evidence. Persistence-bearing slices require a SQL Server-backed migration or integration check; missing provider evidence is a review blocker.
+- Integration test setup failures MUST fail the test run with actionable diagnostics; tests must not skip when SQL Server is unavailable. Test output or the verification handoff must report the provider-backed integration test count.
 
 ## Validator and Endpoint Contract Coverage
 
