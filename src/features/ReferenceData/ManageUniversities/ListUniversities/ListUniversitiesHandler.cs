@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.ListUniversities;
 
@@ -13,7 +12,9 @@ public sealed class ListUniversitiesHandler : IRequestHandler<ListUniversitiesQu
     _dbContext = dbContext;
   }
 
-  public async Task<IReadOnlyList<ListUniversitiesResponse>> Handle(ListUniversitiesQuery request, CancellationToken cancellationToken)
+  public async Task<IReadOnlyList<ListUniversitiesResponse>> Handle(
+    ListUniversitiesQuery request,
+    CancellationToken cancellationToken)
   {
     return await _dbContext.Universities
       .AsNoTracking()

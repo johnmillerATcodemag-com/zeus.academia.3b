@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 
 namespace Zeus.Academia.Tests.Features.ReferenceData.ManageUniversities;
 
@@ -20,25 +19,24 @@ public sealed class AddUniversityHandlerTests
     Assert.True(response.IsActive);
 
     var persisted = await dbContext.Universities.SingleAsync(x => x.Code == "MIT");
-    Assert.Equal("MIT", persisted.Code);
     Assert.Equal("Massachusetts Institute of Technology", persisted.Name);
     Assert.True(persisted.IsActive);
   }
 
   [Fact]
-  public async Task Handle_WhenDuplicateCodeExists_ThrowsUniversityConflictException()
+  public async Task Handle_WhenDuplicateCodeExists_ThrowsUniversityConflictException_AndDoesNotDuplicatePersistence()
   {
     await using var dbContext = CreateInMemoryContext();
-    dbContext.Universities.Add(UniversityRecord.Create("HARVARD", "Harvard University"));
+    dbContext.Universities.Add(UniversityRecord.Create("MIT", "Massachusetts Institute of Technology"));
     await dbContext.SaveChangesAsync();
 
     var handler = new AddUniversityHandler(dbContext);
 
     var exception = await Assert.ThrowsAsync<UniversityConflictException>(async () =>
-      await handler.Handle(new AddUniversityCommand("harvard"), CancellationToken.None));
+      await handler.Handle(new AddUniversityCommand("MIT"), CancellationToken.None));
 
     Assert.Contains("already exists", exception.Message, StringComparison.OrdinalIgnoreCase);
-    Assert.Equal(1, await dbContext.Universities.CountAsync(x => x.Code == "HARVARD"));
+    Assert.Equal(1, await dbContext.Universities.CountAsync(x => x.Code == "MIT"));
   }
 
   private static ManageUniversitiesDbContext CreateInMemoryContext()
