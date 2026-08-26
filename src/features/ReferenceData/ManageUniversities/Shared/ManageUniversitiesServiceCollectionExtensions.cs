@@ -21,26 +21,26 @@ public static class ManageUniversitiesServiceCollectionExtensions
       this IServiceCollection services,
       IConfiguration configuration)
   {
-var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
+    var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
 
-if (string.IsNullOrWhiteSpace(connectionString))
-{
-  connectionString = configuration.GetConnectionString("DefaultConnection");
-}
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+      connectionString = configuration.GetConnectionString("DefaultConnection");
+    }
 
-if (string.IsNullOrWhiteSpace(connectionString))
-{
-  if (OperatingSystem.IsWindows())
-  {
-    connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Zeus_Academia_Dev;Integrated Security=True;TrustServerCertificate=True;";
-  }
-  else
-  {
-    throw new InvalidOperationException(
-      "SQL Server connection string not found. Set ZEUS_SQLSERVER_CONNECTION environment variable or add ConnectionStrings:DefaultConnection to appsettings.json. " +
-      "LocalDB is only available on Windows; configure a SQL Server connection string for non-Windows environments.");
-  }
-}
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+      if (OperatingSystem.IsWindows())
+      {
+        connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Zeus_Academia_Dev;Integrated Security=True;TrustServerCertificate=True;";
+      }
+      else
+      {
+        throw new InvalidOperationException(
+          "SQL Server connection string not found. Set ZEUS_SQLSERVER_CONNECTION environment variable or add ConnectionStrings:DefaultConnection to appsettings.json. " +
+          "LocalDB is only available on Windows; configure a SQL Server connection string for non-Windows environments.");
+      }
+    }
 
     services.AddDbContext<ManageUniversitiesDbContext>(options =>
         options.UseSqlServer(connectionString));
