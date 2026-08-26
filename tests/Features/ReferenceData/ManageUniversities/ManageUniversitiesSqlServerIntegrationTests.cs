@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities.GetUniversityByCode;
 using Zeus.Academia.Features.ReferenceData.ManageUniversities.ListUniversities;
 
 namespace Zeus.Academia.Tests.Features.ReferenceData.ManageUniversities;
@@ -63,5 +64,25 @@ public sealed class ManageUniversitiesSqlServerIntegrationTests
 
     Assert.Equal(["BOSTON_U", "MIT", "STANFORD"], firstResult.Select(x => x.Code).ToArray());
     Assert.Equal(firstResult, secondResult);
+  }
+
+  [Fact]
+  public async Task GetUniversityByCode_ReturnsCanonicalAndActiveStateFromSqlServer()
+  {
+    await using var database = await ManageUniversitiesSqlServerTestDatabase.CreateAsync();
+    await using var writeContext = database.CreateContext();
+    var university = UniversityRecord.Create("mit", "Massachusetts Institute of Technology");
+    university.Deactivate();
+    writeContext.Universities.Add(university);
+    await writeContext.SaveChangesAsync();
+
+    await using var readContext = database.CreateContext();
+    var response = await new GetUniversityByCodeHandler(readContext)
+      .Handle(new GetUniversityByCodeQuery(" MIT "), CancellationToken.None);
+
+    Assert.True(response.IsFound);
+    Assert.Equal("MIT", response.Code);
+    Assert.Equal("Massachusetts Institute of Technology", response.Name);
+    Assert.False(response.IsActive);
   }
 }
