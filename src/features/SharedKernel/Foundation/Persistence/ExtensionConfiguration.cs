@@ -12,6 +12,9 @@ public sealed class ExtensionConfiguration : IEntityTypeConfiguration<Extension>
 
     builder.HasKey(x => x.Number);
 
+    builder.Property(x => x.Number)
+      .ValueGeneratedNever();
+
     builder.Property(x => x.AssignedEmpNr)
       .HasMaxLength(SharedKernelFieldLengths.EmpNr);
 

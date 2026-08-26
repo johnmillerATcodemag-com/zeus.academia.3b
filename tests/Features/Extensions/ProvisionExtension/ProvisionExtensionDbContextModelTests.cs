@@ -18,6 +18,7 @@ public sealed class ProvisionExtensionDbContextModelTests
     Assert.NotNull(primaryKey);
     Assert.Single(primaryKey.Properties);
     Assert.Equal("Number", primaryKey.Properties[0].Name);
+    Assert.Equal(Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never, primaryKey.Properties[0].ValueGenerated);
 
     var duplicatePkUniqueIndex = entityType.GetIndexes().Any(index =>
       index.IsUnique &&

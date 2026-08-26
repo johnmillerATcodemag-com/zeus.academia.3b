@@ -1,3 +1,4 @@
+using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -11,9 +12,13 @@ public static class ProvisionExtensionEndpoint
 {
   public static RouteHandlerBuilder MapProvisionExtension(this RouteGroupBuilder group)
   {
-    return group.MapPost("/", async (ProvisionExtensionCommand command, ISender sender, CancellationToken ct) =>
+    return group.MapPost("/", async (
+      ProvisionExtensionCommand command,
+      IValidator<ProvisionExtensionCommand> validator,
+      ISender sender,
+      CancellationToken ct) =>
     {
-      var validationResult = new ProvisionExtensionCommandValidator().Validate(command);
+      var validationResult = await validator.ValidateAsync(command, ct);
       if (!validationResult.IsValid)
       {
         return Results.ValidationProblem(ToDictionary(validationResult));

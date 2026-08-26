@@ -1,3 +1,4 @@
+using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -12,10 +13,14 @@ public static class DeprovisionExtensionEndpoint
 {
   public static RouteHandlerBuilder MapDeprovisionExtension(this RouteGroupBuilder group)
   {
-    return group.MapDelete("/{number:int}", async (int number, ISender sender, CancellationToken ct) =>
+    return group.MapDelete("/{number:int}", async (
+      int number,
+      IValidator<DeprovisionExtensionCommand> validator,
+      ISender sender,
+      CancellationToken ct) =>
     {
       var command = new DeprovisionExtensionCommand(number);
-      var validationResult = new DeprovisionExtensionCommandValidator().Validate(command);
+      var validationResult = await validator.ValidateAsync(command, ct);
       if (!validationResult.IsValid)
       {
         return Results.ValidationProblem(ToDictionary(validationResult));
