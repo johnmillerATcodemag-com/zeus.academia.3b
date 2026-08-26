@@ -1,6 +1,6 @@
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
-namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
+namespace Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
 public sealed class UniversityRecord
 {
@@ -8,11 +8,18 @@ public sealed class UniversityRecord
   {
   }
 
+  private UniversityRecord(string code, string name, bool isActive)
+  {
+    Code = code;
+    Name = name;
+    IsActive = isActive;
+  }
+
   public string Code { get; private set; } = string.Empty;
 
   public string Name { get; private set; } = string.Empty;
 
-  public bool IsActive { get; private set; } = true;
+  public bool IsActive { get; private set; }
 
   public static UniversityRecord Create(string code, string name)
   {
@@ -31,12 +38,7 @@ public sealed class UniversityRecord
         nameof(name));
     }
 
-    return new UniversityRecord
-    {
-      Code = university.Code,
-      Name = normalizedName,
-      IsActive = true
-    };
+    return new UniversityRecord(university.Code, normalizedName, isActive: true);
   }
 
   public void Deactivate() => IsActive = false;

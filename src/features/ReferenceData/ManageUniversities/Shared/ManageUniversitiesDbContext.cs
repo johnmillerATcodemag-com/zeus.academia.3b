@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities;
 
-public sealed class ManageUniversitiesDbContext : DbContext
+/// <summary>
+/// DbContext for ManageUniversities feature.
+/// Owns the Universities table and related domain entities.
+/// </summary>
+public class ManageUniversitiesDbContext : DbContext
 {
   public ManageUniversitiesDbContext(DbContextOptions<ManageUniversitiesDbContext> options)
     : base(options)

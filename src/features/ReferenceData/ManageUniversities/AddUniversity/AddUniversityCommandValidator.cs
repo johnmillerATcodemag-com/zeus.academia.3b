@@ -1,5 +1,4 @@
 using FluentValidation;
-using Zeus.Academia.Features.ReferenceData.ManageUniversities.Shared;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageUniversities.AddUniversity;
@@ -12,7 +11,7 @@ public sealed class AddUniversityCommandValidator : AbstractValidator<AddUnivers
       .Cascade(CascadeMode.Stop)
       .Must(code => !string.IsNullOrWhiteSpace(code))
       .WithMessage("Code is required.")
-      .Must(code => code is not null && code.Trim().Length <= SharedKernelFieldLengths.UniversityCode)
+      .Must(code => code!.Trim().Length <= SharedKernelFieldLengths.UniversityCode)
       .WithMessage($"Code cannot exceed {SharedKernelFieldLengths.UniversityCode} characters.")
       .Must(code => UniversityCodeCatalog.IsAllowed(code, out _))
       .WithMessage(_ => $"Allowed values: {UniversityCodeCatalog.AllowedValuesMessage}");

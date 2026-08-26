@@ -148,6 +148,7 @@ using (var scope = app.Services.CreateScope())
 app.MapManageDegreesEndpoints();
 app.MapManageRanksEndpoints();
 app.MapProvisionExtensionsEndpoints();
+app.MapManageUniversitiesEndpoints();
 app.MapHealthCheck("/health");
 
 app.Run();
