@@ -58,6 +58,7 @@ Every implementation prompt must explicitly require the implementation team to d
 - confirm that every new route or endpoint aggregator is registered in the application startup/composition root
 - verify runtime reachability rather than assuming a compile-only success
 - reuse any existing numeric normalization, validation, or conflict rules instead of duplicating them across validators and handlers
+- name the canonical factory or shared helper that owns every constrained numeric/date/enum rule, require validators and handlers to delegate to it, and require direct boundary tests when it changes
 - check neighboring slices and shared helper files for single-source-of-truth logic before new rules are introduced
 - verify that a feature-local DbContext or migration path is explicitly owned and invoked from the host when startup applies migrations
 - include a verification step for `Produces*` response contracts when the route advertises validation or conflict responses
@@ -174,6 +175,7 @@ Required coverage:
 - Persisted identifier guards at public APIs (factories/mutators that accept persisted identifiers such as `empNr` enforce shared max-length constraints and normalization before state mutation)
 - Normalization ownership boundaries (unrelated domain concepts must not depend on each other's normalization helpers; use local normalization or a neutral shared helper)
 - Canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
+- Canonical-owner enforcement for numeric/date/enum rules (prompts must name the owning factory/value object, prohibit duplicate command-local algorithms, and require direct tests for the owner plus request-property error adaptation)
 - Immutable read-only collection exposure (do not expose mutable backing collections through `IReadOnlyCollection`; include array-backed catalogs and require defensive copies or read-only wrappers such as `AsReadOnly()` when applicable)
 - Array-backed or static catalogs exposed publicly must use wrappers or immutable snapshots that cannot be cast back to the mutable backing array; `IReadOnlyList<T>` alone is not sufficient when the backing storage is an array.
 - Required-text validator semantics for string fields (when whitespace should be treated as missing input, reject null/empty/whitespace with the required-message rule before membership/format checks; do not rely on `NotEmpty()` alone)

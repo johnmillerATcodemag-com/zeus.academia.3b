@@ -50,6 +50,7 @@ Required review checks:
 - Verify that endpoints that advertise validation problems actually translate the expected normalization/argument failures into `Results.ValidationProblem(...)` or equivalent; a 500 from an unhandled `ArgumentException` or `ArgumentOutOfRangeException` is a blocker.
 - Verify if a number, date, enum, or domain rule is normalized in more than one layer, it is centralized.
 - Verify no business rule is duplicated between a command validator, its handler, or mapping helper.
+- Treat duplicated numeric/date/enum normalization as a blocking finding when a canonical factory/value object already exists. Verify the canonical owner is named, validators adapt its failures, handlers call it before mutation, and direct owner tests cover range and lossy-conversion boundaries.
 - Verify there are direct tests for validator and invalid-input behavior when a new validator or validation contract is introduced.
 - Treat split runtime dependency configuration as a blocking finding: verify the host resolves the connection string once, passes it to every feature DbContext registration, and feature helpers do not independently read sources such as `ZEUS_SQLSERVER_CONNECTION` or `ConnectionStrings:DefaultConnection`.
 - Verify the migration owner or startup migration path is explicit whenever a feature-local DbContext participates in `Database.MigrateAsync()`.

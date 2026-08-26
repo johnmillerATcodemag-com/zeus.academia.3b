@@ -56,6 +56,8 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 - MUST keep collection encapsulation boundaries intact by returning read-only wrappers for mutable backing collections (for example `AsReadOnly()` for `List<T>` fields exposed as read-only members)
 - MUST keep canonical normalization and validation logic in one authoritative source of truth; do not duplicate raw-input normalization in helper catalogs or lookup adapters when the domain factory already defines the canonical value
 - MUST centralize numeric/date/enum coercion and range rules in one shared helper or value object, and require handlers, validators, and mapping helpers to reuse that canonical logic instead of re-implementing equivalent checks
+- MUST name the canonical factory or value object that owns each constrained numeric/date/enum invariant. Validators may adapt its exceptions for request-specific errors, and handlers must invoke the same canonical API before mutation; command-local normalization helpers may delegate but must not duplicate the algorithm.
+- MUST add direct boundary tests for any changed public factory or value object, including valid conversion, range failures, and rejection of lossy coercion.
 - MUST NOT keep unreachable `catch` blocks for impossible exceptions; if range checks or earlier guards make a failure impossible, remove the dead catch and rely on the real validation path
 
 **Template:**
@@ -119,7 +121,7 @@ public Order FindOrder(Guid id)
 }
 ```
 
-## Try* and Parsing Contract Guardrails
+## Try\* and Parsing Contract Guardrails
 
 - Use the standard `Try*` pattern: `bool TryX(..., out T? value)` and set `value = null` when the conversion fails.
 - Do not return a non-null placeholder value when the success flag is `false`.

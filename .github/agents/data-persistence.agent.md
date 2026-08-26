@@ -95,6 +95,7 @@ Persistence specialist for slice work that needs concrete schema support behind 
 - When a feature owns a DbContext or migration set, hand off the provider-backed SQL Server harness location, unique database strategy, migration application result, fresh-context read-back result, cleanup behavior, and executed integration-test count. InMemory-only tests are not persistence evidence.
 - Do not invent table structure, key strategy, or migration paths without confirming the current repository layout.
 - Call out any concurrency, migration-ordering, or rollback assumption explicitly.
+- Confirm persisted numeric/date/enum representations match the canonical domain factory and do not introduce a second conversion or range rule at the persistence boundary.
 
 ## Boundaries
 

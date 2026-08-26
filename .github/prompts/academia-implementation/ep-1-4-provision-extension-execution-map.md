@@ -76,7 +76,7 @@ Reuse the existing Shared Kernel extension entity and configuration semantics th
 - `ProvisionExtensionDbContext` is the sole migration owner for `Extensions`
 - No duplicate feature-local entity, table, primary key, or assignment index
 
-The command may accept a numeric decimal representation because the workflow contract uses `extNr` numeric decimal, but only positive whole values are valid. Normalize and range-check at the command/domain boundary, then persist the canonical `int` representation used by `Extension.Number`. Fractional values must be rejected rather than truncated.
+The command may accept a numeric decimal representation because the workflow contract uses `extNr` numeric decimal, but only positive whole values are valid. `Extension.Create(decimal)` is the canonical owner of normalization, range checking, and conversion to the persisted `int` representation used by `Extension.Number`; validators and handlers must delegate to it. Fractional values must be rejected rather than truncated.
 
 ## Required Behavior
 
@@ -91,6 +91,7 @@ The command may accept a numeric decimal representation because the workflow con
 ## Verification Map
 
 - Validator tests: positive whole-number acceptance, fractional rejection, range handling, and actionable property failures.
+- Canonical factory tests: valid conversion, non-positive rejection, fractional rejection, and values above `int.MaxValue`; no command-local copy of these rules is allowed.
 - Provision-handler tests: success, duplicate rejection, and no partial persistence.
 - Deprovision-handler tests: unassigned success, missing extension behavior, and assigned-extension rejection.
 - Domain tests: preserve the existing Extension ownership guards; add direct boundary tests only if public APIs are changed.

@@ -45,6 +45,7 @@ Hard boundaries:
 - Do not bypass shared-kernel or business-rule constraints for speed.
 - If the slice introduces a new route group or feature DbContext, verify the application host maps the routes and applies the migrations before calling the slice complete.
 - If a canonical helper normalizes input, validate length/shape against the normalized value, not the raw input string.
+- Before adding numeric/date/enum validation, locate the domain factory or value object that owns the invariant. Delegate to it from validators and handlers; do not add a duplicate command-local normalization algorithm. Escalate when no canonical owner exists or changing it would affect multiple slices.
 - Do not rely on `null!` for lookup helpers; model failure paths with nullable outputs and explicit caller checks.
 
 Required output structure when invoked:
@@ -57,26 +58,26 @@ Required output structure when invoked:
 
 ## Skills
 
-| Skill | Proficiency |
-| ----- | ----------- |
-| ASP.NET Core minimal APIs | advanced |
-| MediatR vertical slices | advanced |
-| EF Core persistence design | advanced |
-| FluentValidation | advanced |
-| Shared-kernel boundary discipline | advanced |
-| xUnit integration testing | advanced |
-| Domain event wiring | intermediate |
-| Read-model projection queries | advanced |
+| Skill                             | Proficiency  |
+| --------------------------------- | ------------ |
+| ASP.NET Core minimal APIs         | advanced     |
+| MediatR vertical slices           | advanced     |
+| EF Core persistence design        | advanced     |
+| FluentValidation                  | advanced     |
+| Shared-kernel boundary discipline | advanced     |
+| xUnit integration testing         | advanced     |
+| Domain event wiring               | intermediate |
+| Read-model projection queries     | advanced     |
 
 ## Actions
 
-| Action | Type | Prompt File |
-| ------ | ---- | ----------- |
-| Read slice prompt and repo instructions before editing | Simple | — |
-| Implement backend slice files and tests | Simple | — |
-| Run focused build and test commands | Simple | — |
-| Escalate when shared-kernel prerequisites are missing | Simple | — |
-| Execute dependency-ordered rollout of slice prompts | Complex | `.github/prompts/academia/execution-plan.md` |
+| Action                                                 | Type    | Prompt File                                  |
+| ------------------------------------------------------ | ------- | -------------------------------------------- |
+| Read slice prompt and repo instructions before editing | Simple  | —                                            |
+| Implement backend slice files and tests                | Simple  | —                                            |
+| Run focused build and test commands                    | Simple  | —                                            |
+| Escalate when shared-kernel prerequisites are missing  | Simple  | —                                            |
+| Execute dependency-ordered rollout of slice prompts    | Complex | `.github/prompts/academia/execution-plan.md` |
 
 ## Expertise
 

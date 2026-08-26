@@ -194,6 +194,7 @@ The prompt MUST explicitly require proof that the slice is complete in the appli
 - The route is reachable at runtime and the verification command or smoke test is recorded before the slice is marked done.
 - Any endpoint claiming a validation problem contract includes the actual exception-to-response mapping for `ArgumentException`, `ArgumentOutOfRangeException`, and equivalent normalization failures.
 - Validation and normalization logic is centralized in one shared helper or domain primitive; no equivalent number/date/range rule is duplicated across validator, handler, and mapper.
+- Generated prompts must name the canonical factory/value object for each constrained number/date/enum, state which layers delegate to it, prohibit duplicate command-local algorithms, and require direct tests for the canonical owner.
 - New validators include direct tests for required, range, whole-number, and success cases, and invalid input tests verify the endpoint contract is preserved.
 - Unreachable exception handlers or dead catch blocks are not accepted when the real validation path already exists.
 

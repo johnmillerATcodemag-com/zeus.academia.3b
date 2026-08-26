@@ -43,6 +43,7 @@ tags: [fluentvalidation, validation, backend, csharp, mediatr]
 - **Reusability**: Extract common rules to shared validators
 - **Registration gate**: A validator must be registered in DI or the MediatR validation pipeline before the slice is considered complete; a validator file alone is not enough
 - **Single-source-of-truth rule**: Do not duplicate the same normalization, allowed-values, or range logic in both the validator and the handler or mapping layer
+- When a domain factory or value object owns normalization/range rules, validators must call that canonical API and adapt its failures to the request property; they must not reimplement equivalent checks.
 
 ## File Organization
 

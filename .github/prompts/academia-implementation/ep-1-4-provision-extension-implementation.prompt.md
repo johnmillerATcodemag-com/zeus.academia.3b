@@ -51,6 +51,7 @@ mode: agent
 - Required prior slices: Shared Kernel and Application Host and Persistence Composition
 - Blocking risks: extension uniqueness must be preserved for later assignment slices, so do not treat this as disposable seed data.
 - Existing patterns to reuse: command-first slice structure, validator beside command, feature-local DbContext, Shared Kernel entity/configuration reuse, persistence uniqueness, and guard methods preventing invalid deprovisioning.
+- Canonical numeric rule: `Extension.Create(decimal)` is the sole owner of extension-number positivity, whole-number, range, and `int` conversion rules. The ProvisionExtension validator adapts its failures to `ExtNr`, and the handler invokes the same factory before persistence. No command-local numeric normalization algorithm is permitted.
 
 ## Assigned Agents and Role Boundaries
 
@@ -87,6 +88,7 @@ mode: agent
 - Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
+- Direct Shared Kernel factory tests cover valid decimal conversion, non-positive values, fractional values, and values above `int.MaxValue`; validator tests cover the corresponding `ExtNr` property failures.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - `ProvisionExtensionDbContext` is feature-local and is the sole migration owner for the `Extensions` table.
 - The feature must include a complete migration set under `src/features/Extensions/ProvisionExtension/Shared/Migrations/`: migration class, matching Designer metadata, and model snapshot. Verification must record the provider and connection source used; “No migrations were found” or failed fresh-database application blocks completion.
