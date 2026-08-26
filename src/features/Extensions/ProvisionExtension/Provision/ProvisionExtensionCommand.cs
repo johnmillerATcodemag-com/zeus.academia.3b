@@ -8,7 +8,7 @@ public sealed record ProvisionExtensionCommand(decimal ExtNr) : IRequest<Provisi
   {
     if (extNr <= 0m)
     {
-      throw new ArgumentOutOfRangeException(nameof(extNr), extNr, "Extension number must be greater than zero.");
+      throw new ArgumentOutOfRangeException(nameof(extNr), "Extension number must be greater than zero.");
     }
 
     if (extNr != decimal.Truncate(extNr))
@@ -18,7 +18,7 @@ public sealed record ProvisionExtensionCommand(decimal ExtNr) : IRequest<Provisi
 
     if (extNr > int.MaxValue)
     {
-      throw new ArgumentOutOfRangeException(nameof(extNr), extNr, $"Extension number must be between 1 and {int.MaxValue}.");
+      throw new ArgumentOutOfRangeException(nameof(extNr), $"Extension number must be between 1 and {int.MaxValue}.");
     }
 
     return (int)extNr;
