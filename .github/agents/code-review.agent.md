@@ -51,7 +51,7 @@ Required review checks:
 - Verify if a number, date, enum, or domain rule is normalized in more than one layer, it is centralized.
 - Verify no business rule is duplicated between a command validator, its handler, or mapping helper.
 - Verify there are direct tests for validator and invalid-input behavior when a new validator or validation contract is introduced.
-- Verify a host or service registration does not split the same runtime dependency across incompatible configuration sources (for example `ZEUS_SQLSERVER_CONNECTION` and `ConnectionStrings:DefaultConnection`).
+- Treat split runtime dependency configuration as a blocking finding: verify the host resolves the connection string once, passes it to every feature DbContext registration, and feature helpers do not independently read sources such as `ZEUS_SQLSERVER_CONNECTION` or `ConnectionStrings:DefaultConnection`.
 - Verify the migration owner or startup migration path is explicit whenever a feature-local DbContext participates in `Database.MigrateAsync()`.
 - Verify the change includes migration artifacts whenever a feature-local DbContext changes schema.
 - Verify `dotnet ef migrations list` discovers the migration, generated SQL contains the expected schema objects, and fresh SQL Server application is proven; do not accept unit or model tests as a substitute.

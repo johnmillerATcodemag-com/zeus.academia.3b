@@ -90,6 +90,7 @@ Verification specialist for multi-surface vertical slices. Advanced in proving d
 - Use SQL Server-backed verification only; do not substitute SQLite or other in-memory providers.
 - Do not mark persistence constraints as verified unless SQL Server checks were executed or explicitly blocked.
 - Migration readiness gate: inspect the host for `Database.MigrateAsync()`, identify the owning feature project, require the migration class plus Designer and snapshot, run `dotnet ef migrations list`, inspect generated migration SQL, and verify application to a fresh SQL Server database. EF Core InMemory tests are not sufficient persistence evidence. Refuse sign-off when EF reports no migrations or provider application is not proven.
+- Connection composition gate: set a sentinel `ZEUS_SQLSERVER_CONNECTION` and a different `ConnectionStrings:DefaultConnection`, build the host service collection, and verify every feature DbContext registration uses the sentinel value. Refuse sign-off when a feature helper independently reads configuration, environment variables, or a runtime LocalDB fallback.
 
 ## Boundaries
 

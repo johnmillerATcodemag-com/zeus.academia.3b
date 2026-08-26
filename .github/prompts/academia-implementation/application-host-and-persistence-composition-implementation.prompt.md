@@ -60,6 +60,8 @@ mode: agent
 - SQL Server validation must check the actual LocalDB instance or the configured `ZEUS_SQLSERVER_CONNECTION` target before trying migrations.
 - On Windows, LocalDB fallback is allowed only when the instance is confirmed available; do not assume a guessed instance name such as `mssqllocaldb` without verification.
 - Host startup smoke tests must include a health endpoint or equivalent startup probe to confirm the app is listening and the dependency graph resolves successfully.
+- The application host is the sole owner of runtime connection-string resolution. It must resolve the SQL Server value once, apply the documented precedence and platform fallback rules, and pass that resolved value to every feature persistence registration.
+- Feature registration helpers must consume the host-resolved connection string and must not independently read `ZEUS_SQLSERVER_CONNECTION`, `ConnectionStrings:DefaultConnection`, or select a LocalDB fallback. Design-time factories are the only exception and must use the same precedence and platform guards.
 
 ## Assigned Agents and Role Boundaries
 
@@ -83,11 +85,11 @@ mode: agent
 3. Register feature-local contexts and handlers.
    Targets: host DI composition, MediatR/FluentValidation registration, and feature project references.
    Owner: `data-persistence` with `backend-domain`.
-   Validation before next step: ManageRanks, ManageDegrees, ManageUniversities, and ProvisionExtension each resolve through their own feature-local context; Shared Kernel types remain reusable dependencies rather than host-owned behavior.
+   Validation before next step: ManageRanks, ManageDegrees, ManageUniversities, and ProvisionExtension each resolve through their own feature-local context and receive the same host-resolved connection string; Shared Kernel types remain reusable dependencies rather than host-owned behavior.
 4. Establish migration execution and design-time ownership.
    Targets: each owning feature migration root, design-time factories, host startup/migration command, and SQL Server configuration.
    Owner: `data-persistence`.
-   Validation before next step: one migration owner is recorded per table; `Extensions` is owned by `ProvisionExtensionDbContext`; no Shared Kernel migration competes for `Extensions`; non-Windows execution requires `ZEUS_SQLSERVER_CONNECTION`.
+   Validation before next step: one migration owner is recorded per table; `Extensions` is owned by `ProvisionExtensionDbContext`; no Shared Kernel migration competes for `Extensions`; non-Windows execution requires `ZEUS_SQLSERVER_CONNECTION`; and feature registrations do not independently resolve connection settings.
 5. Register endpoint groups.
    Targets: host route registration and feature endpoint aggregators.
    Owner: `backend-domain`.
@@ -112,6 +114,8 @@ mode: agent
 ## Verification and Acceptance Criteria
 
 - The host starts with explicit SQL Server configuration and fails with actionable diagnostics when required non-Windows configuration is absent.
+- Connection-string resolution occurs once in the host, and every feature DbContext registration consumes that same resolved value. Environment-variable precedence over `ConnectionStrings:DefaultConnection` is verified.
+- Feature registration helpers do not independently resolve connection strings or apply runtime LocalDB fallbacks.
 - Each persistence-bearing feature has an explicitly named feature-local DbContext.
 - `ProvisionExtensionDbContext` maps the Shared Kernel `Extension` entity and reuses its configuration semantics.
 - `ProvisionExtensionDbContext` is the sole migration owner for `Extensions`.
@@ -142,6 +146,8 @@ mode: agent
 - [ ] Every feature-local DbContext and migration owner is documented.
 - [ ] `ProvisionExtensionDbContext` exclusively owns `Extensions` migrations.
 - [ ] Runtime and design-time SQL Server configuration agree.
+- [ ] One host-resolved connection string is passed to every runtime feature DbContext.
+- [ ] No feature registration independently reads connection configuration or selects a runtime fallback.
 - [ ] Complete migration metadata is committed for each schema-changing context.
 - [ ] EF migration discovery, generated SQL, and fresh SQL Server application have been verified for every host-migrated context.
 - [ ] No duplicate DbContext migration ownership exists.

@@ -31,6 +31,7 @@ Standards for implementing feature domains as collections of self-contained use-
 
 - A persistence-bearing feature may own a feature-local DbContext and migration set. Shared Kernel domain entities and reusable mapping semantics may be referenced by that context; do not require the feature to reuse `SharedKernelDbContext`.
 - Every persistence-bearing slice must explicitly name its DbContext, table ownership, migration owner, migration artifact root, and the host or deployment command that applies its migrations.
+- Runtime connection-string resolution is owned by the application host. Feature-local DbContext registration must consume the host-resolved value and must not independently read environment/configuration sources or select a LocalDB fallback.
 - No two DbContexts may own migrations for the same table. Shared Kernel does not own feature-slice migrations unless the architecture explicitly assigns a table to it.
 - Placeholder persistence entities are prohibited. Any persistence-bearing model must define a primary key and a valid EF Core configuration before the slice is considered ready.
 - Startup and migration verification must fail explicitly when SQL Server connectivity is unavailable; do not silently skip, swallow, or pass on missing LocalDB/SQL Server prerequisites.
@@ -55,6 +56,8 @@ Before a slice is considered ready for review or merge, verify all of the follow
 - [ ] Startup or integration verification confirms the route is reachable at runtime.
 - [ ] Validation is registered and active for any request that advertises validation responses.
 - [ ] Feature-local DbContext schema changes include migration artifacts and explicit migration ownership.
+- [ ] All feature DbContexts receive the same host-resolved connection string, with environment precedence verified.
+- [ ] Feature registration helpers do not independently resolve runtime connection settings.
 - [ ] EF discovers the feature migration, generated SQL contains the expected schema objects, and a fresh SQL Server database accepts the migration.
 - [ ] Shared normalization or validation logic is centralized instead of duplicated across handlers, validators, and mappings.
 - [ ] Endpoint `Produces*` contracts match actual runtime responses, especially validation, conflict, and parse failures.
