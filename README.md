@@ -76,6 +76,10 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 - [Architecture Decision Record (ADR)](src/models/workflows/adr-phase-0-architecture.md) - Explains 5 key decisions, trade-offs, and alternatives
 - [Phase 0 Completion Checklist](src/models/workflows/phase-0-completion-checklist.md) - Full verification status and quality gates
 
+### Phase 1 Feature Slice
+
+- [ProvisionExtension pool lifecycle slice](src/features/Extensions/ProvisionExtension/) - Adds extension provisioning and deprovisioning commands, route contract, validation, and persistence tests for duplicate protection and assignment guardrails ([Log](ai-logs/2026/08/26/2026-08-26-provision-extension-implementation/conversation.md))
+
 ### Phase 0 Planning & Coordination
 
 - [Academia Slice Execution Plan](.github/prompts/academia/execution-plan.md) - Phases 0-2 delivery sequence and dependencies ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
